@@ -14,7 +14,7 @@ import { AppPagination } from '@/components/AppPagination';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 import { usePrescriptions } from '@/hooks/usePrescriptions';
-import type { PrescriptionFilters as Filters } from '@/types';
+import { usePrescriptionFiltersUrl } from '@/hooks/usePrescriptionFiltersUrl';
 import { DEFAULT_PAGE_SIZE } from '@/types';
 import logoAphp from '@/assets/logo-aphp-white.png';
 
@@ -29,20 +29,22 @@ const queryClient = new QueryClient({
 
 function PrescriptionApp() {
   const { t } = useTranslation();
-  const [filters, setFilters] = useState<Filters>({});
+  const { filters, setFilters, page, setPage } = usePrescriptionFiltersUrl();
   const [showForm, setShowForm] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
   
-  const { data, isLoading, error, refetch } = usePrescriptions(filters, { page: currentPage });
+  const { data, isLoading, error, refetch } = usePrescriptions(filters, { page });
   
   const prescriptions = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
 
-  const handleFiltersChange = (newFilters: Filters) => {
+  const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
-    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   const activeFiltersCount = Object.values(filters).filter(v => v !== undefined && v !== '').length;
@@ -172,9 +174,9 @@ function PrescriptionApp() {
                   {totalPages > 1 && (
                     <div className="mt-6">
                       <AppPagination
-                        currentPage={currentPage}
+                        currentPage={page}
                         totalPages={totalPages}
-                        onPageChange={setCurrentPage}
+                        onPageChange={handlePageChange}
                       />
                     </div>
                   )}

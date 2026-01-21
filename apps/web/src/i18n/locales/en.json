@@ -76,6 +76,11 @@
     "clear": "Clear filters",
     "startDate": "Start date",
     "endDate": "End date",
+    "startDateFrom": "Start - from",
+    "startDateTo": "Start - to",
+    "endDateFrom": "End - from",
+    "endDateTo": "End - to",
+    "selectDate": "Pick a date",
     "apply": "Apply filters",
     "reset": "Reset"
   },

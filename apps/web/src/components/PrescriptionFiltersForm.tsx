@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DatePicker } from '@/components/ui/date-picker';
 import { usePatients, useMedications } from '@/hooks/usePrescriptions';
 import type { PrescriptionFilters, PrescriptionStatus } from '@/types';
 
@@ -46,8 +47,22 @@ export function PrescriptionFiltersForm({
 
   const hasActiveFilters = Object.keys(filters).length > 0;
 
+  // Helper to convert string date to Date object
+  const parseDate = (dateStr?: string): Date | undefined => {
+    if (!dateStr) return undefined;
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? undefined : d;
+  };
+
+  // Helper to convert Date to YYYY-MM-DD string
+  const formatDate = (date?: Date): string | undefined => {
+    if (!date) return undefined;
+    return date.toISOString().split('T')[0];
+  };
+
   return (
     <div className="space-y-4">
+      {/* Row 1: Patient, Medication, Status */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Patient Filter */}
         <div className="space-y-2">
@@ -110,6 +125,49 @@ export function PrescriptionFiltersForm({
               ))}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      {/* Row 2: Date Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Start Date From */}
+        <div className="space-y-2">
+          <Label>{t('filters.startDateFrom')}</Label>
+          <DatePicker
+            value={parseDate(filters.date_debut_from)}
+            onChange={(date) => updateFilter('date_debut_from', formatDate(date))}
+            placeholder={t('filters.selectDate')}
+          />
+        </div>
+
+        {/* Start Date To */}
+        <div className="space-y-2">
+          <Label>{t('filters.startDateTo')}</Label>
+          <DatePicker
+            value={parseDate(filters.date_debut_to)}
+            onChange={(date) => updateFilter('date_debut_to', formatDate(date))}
+            placeholder={t('filters.selectDate')}
+          />
+        </div>
+
+        {/* End Date From */}
+        <div className="space-y-2">
+          <Label>{t('filters.endDateFrom')}</Label>
+          <DatePicker
+            value={parseDate(filters.date_fin_from)}
+            onChange={(date) => updateFilter('date_fin_from', formatDate(date))}
+            placeholder={t('filters.selectDate')}
+          />
+        </div>
+
+        {/* End Date To */}
+        <div className="space-y-2">
+          <Label>{t('filters.endDateTo')}</Label>
+          <DatePicker
+            value={parseDate(filters.date_fin_to)}
+            onChange={(date) => updateFilter('date_fin_to', formatDate(date))}
+            placeholder={t('filters.selectDate')}
+          />
         </div>
       </div>
 
