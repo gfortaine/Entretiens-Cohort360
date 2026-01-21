@@ -1,0 +1,54 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".next/**", "build/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*", ".eslintrc*"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "**/*.test.*", "**/*.spec.*"],
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "e2e/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json"]
+    },
+    "api:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "api:test": {
+      "cache": false
+    },
+    "api:migrate": {
+      "cache": false
+    },
+    "api:seed": {
+      "cache": false
+    },
+    "spark:build": {
+      "cache": true,
+      "outputs": ["target/**"]
+    },
+    "spark:test": {
+      "dependsOn": ["spark:build"],
+      "cache": false
+    }
+  }
+}

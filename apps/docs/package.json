@@ -1,0 +1,10 @@
+{
+  "name": "@cohort360/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Docs app coming soon - VitePress/Docusaurus'",
+    "build": "echo 'Docs build placeholder'"
+  }
+}

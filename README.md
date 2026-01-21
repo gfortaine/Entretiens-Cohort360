@@ -1,5 +1,6 @@
-# 🏥 Entretiens Cohort360 - Exercices Fullstack
+# 🏥 Cohort360 Exercises - Turborepo Monorepo
 
+[![Turborepo](https://img.shields.io/badge/Turborepo-2.7-blueviolet.svg)](https://turbo.build/)
 [![Django 5.2 LTS](https://img.shields.io/badge/Django-5.2%20LTS-green.svg)](https://docs.djangoproject.com/en/5.2/)
 [![React 19](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
@@ -8,227 +9,264 @@
 
 > **Candidature Développeur Fullstack Senior - AP-HP/Cohort360**
 > 
-> Exercices techniques complétés avec stack moderne et tests e2e complets.
+> Exercices techniques avec architecture monorepo moderne (Turborepo).
 
 ---
 
-## ✅ Statut des Exercices
+## 📁 Monorepo Structure
 
-| Exercice | Status | Tests | Stack |
+```
+cohort360-exercises/
+├── apps/                        # Applications
+│   ├── web/                     # 🌐 Frontend React (Patient Portal)
+│   │   ├── src/
+│   │   │   ├── components/      # PrescriptionForm, List, Filters
+│   │   │   ├── hooks/           # React Query hooks
+│   │   │   ├── api/             # Client Axios
+│   │   │   └── test/            # 18 tests Vitest
+│   │   └── package.json
+│   └── docs/                    # 📚 Documentation (placeholder)
+│
+├── services/                    # Backend Services
+│   ├── api/                     # 🐍 Django REST API
+│   │   ├── config/              # Django 5.2 LTS settings
+│   │   ├── medical/             # App: Patient, Medication, Prescription
+│   │   │   ├── models.py
+│   │   │   ├── serializers.py
+│   │   │   ├── views.py
+│   │   │   └── tests/           # 29 tests unitaires
+│   │   └── pyproject.toml       # uv + dev tools
+│   │
+│   └── spark/                   # ⚡ Scala/Spark Data Engine
+│       ├── src/main/scala/
+│       │   └── com/exercise/
+│       │       ├── Main.scala
+│       │       └── engine/      # CohortSearchEngine
+│       └── build.sbt
+│
+├── packages/                    # Shared Packages
+│   ├── types/                   # 📦 @cohort360/types
+│   ├── ui/                      # 🎨 @cohort360/ui
+│   ├── eslint-config/           # 🔧 @cohort360/eslint-config
+│   └── typescript-config/       # 🔧 @cohort360/typescript-config
+│
+├── e2e/                         # 🧪 Playwright E2E Tests
+│   ├── api/                     # API integration tests
+│   ├── prescriptions/           # UI tests
+│   └── pages/                   # Page Object Models
+│
+├── turbo.json                   # Turborepo pipeline config
+├── package.json                 # Workspace root
+└── playwright.config.ts         # E2E test config
+```
+
+---
+
+## ✅ Exercise Status
+
+| Exercise | Status | Tests | Stack |
 |----------|--------|-------|-------|
-| **Backend Django** | ✅ Complété | 29/29 | Django 5.2 LTS, DRF, uv |
-| **Frontend React** | ✅ Complété | 18/18 | React 19, TypeScript, Vite |
-| **Scala/Spark** | ✅ Complété | Compile | Scala 2.12, Spark 3.5 |
-| **E2E Tests** | ✅ Ajouté | 24/24 | Playwright, Page Object Model |
+| **Backend Django** | ✅ Complete | 29/29 | Django 5.2 LTS, DRF, uv |
+| **Frontend React** | ✅ Complete | 18/18 | React 19, TypeScript, Vite |
+| **Scala/Spark** | ✅ Complete | Compile | Scala 2.12, Spark 3.5 |
+| **E2E Tests** | ✅ Added | 24/24 | Playwright, Page Object Model |
 
-**Total: 71 tests passants**
+**Total: 71 tests passing**
 
 ---
 
 ## 🚀 Quick Start
 
-```bash
-# 1. Installer les dépendances (uv + npm)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+### Prerequisites
 
-# 2. Backend Django
-cd Exercice_Django
+- Node.js 20+
+- Python 3.12+ with [uv](https://docs.astral.sh/uv/)
+- Scala 2.12 + sbt (for Spark exercise)
+
+### Setup
+
+```bash
+# 1. Install root dependencies (includes Turborepo)
+npm install
+
+# 2. Setup Django API
+cd services/api
 uv sync --all-extras
 uv run python manage.py migrate
-uv run python manage.py seed_demo --patients 100 --medications 30
-uv run python manage.py runserver 8000
+uv run python manage.py seed_demo
+cd ../..
 
-# 3. Frontend React (nouveau terminal)
-cd Exercice_Front/prescription-app
-npm install
-npm run dev
-
-# 4. Ouvrir l'application
-open http://127.0.0.1:3000
+# 3. Run development servers
+npm run api:dev      # Django on http://127.0.0.1:8000
+npm run dev          # React on http://127.0.0.1:3000 (via Turbo)
 ```
 
 ---
 
-## 🧪 Tests
+## 📜 Available Scripts
 
-### Exécuter tous les tests
+### Root Commands (Turborepo)
 
 ```bash
-# Backend Django (29 tests)
-cd Exercice_Django && uv run pytest medical/tests/ -v
+# Development
+npm run dev              # Start all dev servers (parallel)
+npm run build            # Build all packages
+npm run lint             # Lint all code
+npm run test             # Run all tests
+npm run typecheck        # TypeScript type checking
 
-# Frontend React (18 tests)
-cd Exercice_Front/prescription-app && npm test
+# API (Django)
+npm run api:dev          # Start Django server
+npm run api:test         # Run Django tests
+npm run api:migrate      # Run migrations
+npm run api:seed         # Seed demo data
 
-# E2E Playwright (24 tests) - serveurs doivent tourner
-npm run test:e2e
+# Spark
+npm run spark:build      # Compile Scala
+npm run spark:test       # Run Spark tests
+npm run spark:run        # Run Spark job
+
+# E2E (Playwright)
+npm run test:e2e         # Run all E2E tests
+npm run test:e2e:ui      # Interactive UI mode
+npm run test:api         # API integration tests only
 ```
 
-### Scripts disponibles
+### Package-specific Commands
 
 ```bash
-npm run test:django     # Tests Django unitaires
-npm run test:frontend   # Tests React/Vitest
-npm run test:e2e        # Tests Playwright e2e
-npm run test:e2e:ui     # Mode UI interactif
-npm run test:api        # Tests API uniquement
-npm run dev:django      # Lancer Django
-npm run dev:frontend    # Lancer React
+# Frontend (apps/web)
+cd apps/web
+npm run dev              # Vite dev server
+npm run build            # Production build
+npm test                 # Vitest tests
+
+# Django (services/api)
+cd services/api
+uv run pytest            # Unit tests
+uv run python manage.py shell  # Django shell
 ```
 
 ---
 
-## 📦 Architecture
+## 🧪 Testing
 
-```
-Entretiens-Cohort360/
-├── Exercice_Django/           # Backend API REST
-│   ├── config/                # Django 5.2 LTS settings
-│   ├── medical/               # App principale
-│   │   ├── models.py          # Patient, Medication, Prescription
-│   │   ├── serializers.py     # DRF serializers
-│   │   ├── views.py           # ViewSets avec filtres
-│   │   └── tests/             # 29 tests unitaires
-│   └── pyproject.toml         # Config uv + outils dev
-│
-├── Exercice_Front/            # Frontend React
-│   └── prescription-app/
-│       ├── src/
-│       │   ├── components/    # PrescriptionForm, List, Filters
-│       │   ├── hooks/         # React Query hooks
-│       │   ├── api/           # Client Axios
-│       │   └── test/          # 18 tests Vitest
-│       └── package.json
-│
-├── Exercice_scala_spark/      # Traitement données
-│   └── src/main/scala/        # CohortSearchEngine
-│
-├── tests/                     # E2E Tests Playwright
-│   ├── pages/                 # Page Object Model
-│   ├── api/                   # API integration tests
-│   └── prescriptions/         # UI e2e tests
-│
-└── playwright.config.ts       # Config Playwright
-```
+### Run All Tests
 
----
-
-## 🔧 Stack Technique
-
-### Backend
-- **Django 5.2 LTS** - Support jusqu'à avril 2028
-- **Django REST Framework 3.15** - API REST
-- **django-filter** - Filtres avancés
-- **django-cors-headers** - CORS support
-- **uv** - Package manager Rust-based (10x plus rapide que pip)
-- **ruff** - Linting & formatting
-- **mypy + django-stubs** - Type checking
-- **pytest-django** - Testing
-
-### Frontend
-- **React 19** - Dernière version stable
-- **TypeScript 5.9** - Type safety
-- **Vite (rolldown-vite)** - Build ultra-rapide
-- **TanStack React Query** - Data fetching & caching
-- **React Hook Form + Zod** - Formulaires & validation
-- **Vitest** - Testing
-
-### E2E Testing
-- **Playwright 1.57** - Multi-browser testing
-- **Page Object Model** - Maintenabilité
-- **Accessibility-first locators** - WCAG compliant
-- **API mocking** - Tests isolés
-
----
-
-## 📋 Exercice Django - API Prescription
-
-### Endpoints implémentés
-
-| Méthode | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/Prescription` | Liste avec filtres |
-| GET | `/Prescription/{id}` | Détail |
-| POST | `/Prescription` | Création |
-| PUT/PATCH | `/Prescription/{id}` | Mise à jour |
-| DELETE | `/Prescription/{id}` | Suppression |
-
-### Filtres disponibles
-- `patient=<id>` - Filtrer par patient
-- `medication=<id>` - Filtrer par médicament
-- `status=valide|en_attente|suppr` - Filtrer par statut
-- `date_debut_from`, `date_debut_to` - Intervalle date début
-- `date_fin_from`, `date_fin_to` - Intervalle date fin
-
-### Exemple création
 ```bash
-curl -X POST "http://127.0.0.1:8000/Prescription" \
-     -H 'Content-Type: application/json' \
-     -d '{
-           "patient": 1,
-           "medication": 1,
-           "date_debut": "2025-03-01",
-           "date_fin": "2025-04-01",
-           "status": "valide",
-           "comment": "Posologie standard"
-         }'
+# Django (29 tests)
+npm run api:test
+
+# React/Vitest (18 tests)
+cd apps/web && npm test
+
+# E2E (24 tests) - requires servers running
+npm run api:dev &        # Start Django
+npm run test:e2e         # Run Playwright
+```
+
+### Test Coverage
+
+| Suite | Tests | Time | Coverage |
+|-------|-------|------|----------|
+| Django API | 29 | ~0.7s | Models, Views, Filters |
+| React Components | 18 | ~0.9s | Components, Hooks, API |
+| E2E Playwright | 24 | ~1.4s | Full user flows |
+
+---
+
+## 📦 Shared Packages
+
+### @cohort360/types
+
+Shared TypeScript types for the healthcare domain:
+
+```typescript
+import { Patient, Medication, Prescription, PrescriptionStatus } from '@cohort360/types';
+```
+
+### @cohort360/ui
+
+Shared React UI components (future):
+
+```typescript
+import { Button, Card } from '@cohort360/ui';
+```
+
+### @cohort360/typescript-config
+
+Shared TypeScript configurations:
+
+```json
+{
+  "extends": "@cohort360/typescript-config/vite.json"
+}
 ```
 
 ---
 
-## 📋 Exercice Frontend - React App
+## 🔧 Turborepo Features
 
-### Fonctionnalités
-- ✅ Affichage liste des prescriptions avec données patient/médicament
-- ✅ Formulaire de création avec validation Zod
-- ✅ Filtres dynamiques (patient, médicament, status, dates)
-- ✅ Feedback utilisateur (succès/erreur)
-- ✅ Responsive design
-- ✅ Gestion d'état avec React Query
+### Pipeline Caching
 
----
+Turborepo caches build outputs for faster rebuilds:
 
-## 📋 Exercice Scala/Spark - CohortSearchEngine
+```bash
+turbo run build --dry-run   # See what would be built
+turbo run build             # Cached builds
+```
 
-### Fonctionnalités
-- ✅ Recherche de cohortes avec requêtes JSON
-- ✅ Filtres sur âge, genre, pathologies
-- ✅ Opérateurs AND/OR/NOT
-- ✅ Connexion Solr pour données FHIR
+### Task Dependencies
 
----
-
-## 🎯 Améliorations apportées
-
-1. **Migration Django 5.2 LTS** - Support jusqu'en 2028
-2. **Migration uv** - Remplacement pip/venv (10x plus rapide)
-3. **pyproject.toml** - Configuration moderne Python
-4. **Tests E2E Playwright** - 24 tests API + UI
-5. **Page Object Model** - Maintenabilité des tests
-6. **CORS support** - Intégration frontend/backend
-7. **TypeScript strict** - Type safety complète
-8. **Documentation complète** - README modernisés
+```json
+// turbo.json
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
+```
 
 ---
 
-## 📖 Branches Git
+## 🏗️ Architecture Decisions
 
-| Branche | Contenu |
-|---------|---------|
-| `main` | Code original des exercices |
-| `feature/exercise-django-prescription` | Solution Django |
-| `feature/exercise-frontend-prescription` | Solution Frontend |
-| `feature/exercise-scala-spark` | Solution Scala |
-| `feature/consolidated-exercises-e2e` | **Branche finale avec tout** |
+### Why Turborepo?
+
+1. **Incremental builds**: Only rebuild what changed
+2. **Parallel execution**: Run tasks in parallel when possible
+3. **Shared packages**: Common types and UI components
+4. **Consistent tooling**: Shared configs across apps
+
+### Why services/ instead of apps/?
+
+- `apps/` = User-facing applications (web, mobile, docs)
+- `services/` = Backend services (api, spark, workers)
+- Clear separation of concerns and deployment targets
+
+### Scala/Spark Placement
+
+The Spark service is in `services/spark/` but managed by sbt, not npm workspaces. Turborepo orchestrates it via shell scripts.
 
 ---
 
-## 👤 Auteur
+## 📝 License
 
-**Guillaume FORTAINE**
-- Candidature: Développeur Fullstack Senior - AP-HP/Cohort360
-- Stack: TypeScript, React, Python, Django, Scala, Spark
+MIT © Guillaume FORTAINE
 
 ---
 
-**Merci pour votre attention ! 🎓**
+## 🔗 Links
+
+- [Original Exercise Instructions](README.original.md)
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [React 19 Docs](https://react.dev/)
+- [Turborepo Docs](https://turbo.build/repo/docs)
+- [Playwright Docs](https://playwright.dev/)

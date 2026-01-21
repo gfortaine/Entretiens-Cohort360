@@ -1,7 +1,11 @@
 # ============================================
 # ENTRETIENS-COHORT360 - Comprehensive .gitignore
-# Django + React + Scala/Spark + Playwright
+# Turborepo Monorepo: Django + React + Scala/Spark + Playwright
 # ============================================
+
+# ==================== TURBOREPO ====================
+.turbo/
+.turbo
 
 # ==================== PYTHON / DJANGO ====================
 # Byte-compiled / optimized / DLL files
