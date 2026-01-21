@@ -97,7 +97,7 @@ describe('PrescriptionList', () => {
       { wrapper: createWrapper() }
     );
     
-    expect(screen.getByText(/2 prescriptions affichées/i)).toBeInTheDocument();
+    expect(screen.getByText(/2 prescription\(s\) affichée\(s\)/i)).toBeInTheDocument();
   });
 
   it('affiche les informations du patient correctement', () => {

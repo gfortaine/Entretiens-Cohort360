@@ -7,6 +7,15 @@ from datetime import date, timedelta
 from medical.models import Patient, Medication, Prescription
 
 
+def get_results(response):
+    """Helper: Extract results from paginated or non-paginated response."""
+    data = response.json()
+    # If paginated response, extract results
+    if isinstance(data, dict) and "results" in data:
+        return data["results"]
+    return data
+
+
 class ApiListTests(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -24,33 +33,33 @@ class ApiListTests(TestCase):
         url = reverse("patient-list")
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
-        self.assertGreaterEqual(len(r.json()), 3)
+        self.assertGreaterEqual(len(get_results(r)), 3)
 
     def test_patient_filter_nom(self):
         url = reverse("patient-list")
         r = self.client.get(url, {"nom": "mart"})
         self.assertEqual(r.status_code, 200)
-        data = r.json()
+        data = get_results(r)
         self.assertTrue(all("mart" in p["last_name"].lower() for p in data))
 
     def test_patient_filter_date(self):
         url = reverse("patient-list")
         r = self.client.get(url, {"date_naissance": "1980-05-20"})
         self.assertEqual(r.status_code, 200)
-        data = r.json()
+        data = get_results(r)
         self.assertTrue(all(p["birth_date"] == "1980-05-20" for p in data))
 
     def test_medication_list(self):
         url = reverse("medication-list")
         r = self.client.get(url)
         self.assertEqual(r.status_code, 200)
-        self.assertGreaterEqual(len(r.json()), 2)
+        self.assertGreaterEqual(len(get_results(r)), 2)
 
     def test_medication_filter_status(self):
         url = reverse("medication-list")
         r = self.client.get(url, {"status": "actif"})
         self.assertEqual(r.status_code, 200)
-        data = r.json()
+        data = get_results(r)
         self.assertTrue(all(m["status"] == "actif" for m in data))
 
 
@@ -109,7 +118,7 @@ class PrescriptionAPITests(TestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         self.assertGreaterEqual(len(data), 2)
     
     def test_prescription_list_includes_nested_patient_medication(self):
@@ -118,7 +127,7 @@ class PrescriptionAPITests(TestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         first = data[0]
         
         # Vérifie la structure imbriquée
@@ -133,7 +142,7 @@ class PrescriptionAPITests(TestCase):
         response = self.client.get(url, {"patient": self.patient1.id})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         self.assertTrue(all(p["patient"]["id"] == self.patient1.id for p in data))
     
     def test_prescription_filter_by_medication(self):
@@ -142,7 +151,7 @@ class PrescriptionAPITests(TestCase):
         response = self.client.get(url, {"medication": self.medication1.id})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         self.assertTrue(all(p["medication"]["id"] == self.medication1.id for p in data))
     
     def test_prescription_filter_by_status(self):
@@ -151,7 +160,7 @@ class PrescriptionAPITests(TestCase):
         response = self.client.get(url, {"status": "en_attente"})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         self.assertTrue(all(p["status"] == "en_attente" for p in data))
     
     def test_prescription_filter_by_date_debut_range(self):
@@ -163,7 +172,7 @@ class PrescriptionAPITests(TestCase):
         })
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         # Seule prescription1 a une date de début dans cet intervalle
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], self.prescription1.id)
@@ -177,7 +186,7 @@ class PrescriptionAPITests(TestCase):
         })
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         # Seule prescription2 a une date de fin dans cet intervalle
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], self.prescription2.id)
@@ -191,7 +200,7 @@ class PrescriptionAPITests(TestCase):
         })
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        data = get_results(response)
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["patient"]["id"], self.patient1.id)
         self.assertEqual(data[0]["status"], "valide")
