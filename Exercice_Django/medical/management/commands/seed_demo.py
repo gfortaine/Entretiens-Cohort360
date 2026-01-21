@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from django.core.management.base import BaseCommand
 
-from medical.models import Patient, Medication
+from medical.models import Patient, Medication, Prescription
 
 
 def random_date(start_year=1940, end_year=2025):
@@ -14,18 +14,34 @@ def random_date(start_year=1940, end_year=2025):
     return start_dt + timedelta(days=random.randint(0, days))
 
 
+def random_prescription_dates():
+    """Génère une paire de dates valide (start_date, end_date) pour une prescription."""
+    start_date = date(2024, 1, 1) + timedelta(days=random.randint(0, 365))
+    duration = random.randint(7, 90)  # Entre 7 et 90 jours
+    end_date = start_date + timedelta(days=duration)
+    return start_date, end_date
+
+
 class Command(BaseCommand):
-    Patient.objects.all().delete()
-    Medication.objects.all().delete()
-    help = "Seed the database with demo Patients and Medications"
+    help = "Seed the database with demo Patients, Medications, and Prescriptions"
 
     def add_arguments(self, parser):
         parser.add_argument("--patients", type=int, default=10)
         parser.add_argument("--medications", type=int, default=5)
+        parser.add_argument("--prescriptions", type=int, default=30)
+        parser.add_argument("--clean", action="store_true", help="Delete existing data before seeding")
 
     def handle(self, *args, **options):
         n_patients = options["patients"]
         n_meds = options["medications"]
+        n_prescriptions = options["prescriptions"]
+        clean = options.get("clean", False)
+        
+        if clean:
+            Prescription.objects.all().delete()
+            Patient.objects.all().delete()
+            Medication.objects.all().delete()
+            self.stdout.write(self.style.WARNING("Deleted existing data."))
 
         last_names = [
             "Martin", "Bernard", "Thomas", "Petit", "Robert",
@@ -86,6 +102,37 @@ class Command(BaseCommand):
             m = Medication.objects.create(code=code, label=label, status=status)
             created_meds.append(m)
 
+        # Création des prescriptions
+        comments = [
+            "Traitement de fond",
+            "Prescription d'urgence",
+            "Renouvellement mensuel",
+            "Suite hospitalisation",
+            "Prévention saisonnière",
+            "Traitement chronique",
+            "Post-opératoire",
+            None,  # Certaines prescriptions sans commentaire
+            None,
+        ]
+        
+        created_prescriptions = []
+        for _ in range(n_prescriptions):
+            start_date, end_date = random_prescription_dates()
+            prescription = Prescription.objects.create(
+                patient=random.choice(created_patients),
+                medication=random.choice(created_meds),
+                start_date=start_date,
+                end_date=end_date,
+                status=random.choice([
+                    Prescription.STATUS_VALIDE,
+                    Prescription.STATUS_EN_ATTENTE,
+                    Prescription.STATUS_SUPPR,
+                ]),
+                comment=random.choice(comments),
+            )
+            created_prescriptions.append(prescription)
+
         self.stdout.write(self.style.SUCCESS(
-            f"Created {len(created_patients)} patients and {len(created_meds)} medications."
+            f"Created {len(created_patients)} patients, {len(created_meds)} medications, "
+            f"and {len(created_prescriptions)} prescriptions."
         ))
