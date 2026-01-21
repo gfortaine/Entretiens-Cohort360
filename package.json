@@ -1,0 +1,33 @@
+{
+  "name": "entretiens-cohort360",
+  "version": "1.0.0",
+  "description": "Exercices techniques Fullstack & Data - AP-HP Cohort360",
+  "private": true,
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
+    "test:api": "playwright test tests/api/",
+    "screenshot": "mkdir -p screenshots && playwright test tests/prescriptions/ --update-snapshots",
+    "dev:django": "cd Exercice_Django && uv run python manage.py runserver",
+    "dev:frontend": "cd Exercice_Front/prescription-app && npm run dev",
+    "test:django": "cd Exercice_Django && uv run pytest medical/tests/ -v",
+    "test:frontend": "cd Exercice_Front/prescription-app && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphp/Entretiens-Cohort360.git"
+  },
+  "keywords": ["cohort360", "healthcare", "django", "react", "typescript", "playwright"],
+  "author": "Guillaume FORTAINE",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aphp/Entretiens-Cohort360/issues"
+  },
+  "homepage": "https://github.com/aphp/Entretiens-Cohort360#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}
