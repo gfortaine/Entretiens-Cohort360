@@ -134,13 +134,13 @@ test.describe('URL State - Deep Linking', () => {
   });
 
   test('should load page with date filters from URL', async ({ page }) => {
-    await page.goto('/?date_debut_from=2025-01-01&date_debut_to=2025-12-31');
+    await page.goto('/?start_date_from=2025-01-01&start_date_to=2025-12-31');
     
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     
     const url = new URL(page.url());
-    expect(url.searchParams.get('date_debut_from')).toBe('2025-01-01');
-    expect(url.searchParams.get('date_debut_to')).toBe('2025-12-31');
+    expect(url.searchParams.get('start_date_from')).toBe('2025-01-01');
+    expect(url.searchParams.get('start_date_to')).toBe('2025-12-31');
   });
 });
 

@@ -123,8 +123,8 @@ test.describe('API - Prescriptions CRUD', () => {
     const newPrescription = {
       patient: patientId,
       medication: medicationId,
-      date_debut: '2025-07-01',
-      date_fin: '2025-07-31',
+      start_date: '2025-07-01',
+      end_date: '2025-07-31',
       status: 'valide',
       comment: 'E2E API Test - Playwright',
     };
@@ -212,7 +212,7 @@ test.describe('API - Prescriptions CRUD', () => {
 
   test('GET /Prescription with date filter - should filter by date range', async ({ request }) => {
     const response = await request.get(
-      `${API_BASE}/Prescription?date_debut_from=2024-01-01&date_debut_to=2026-12-31`
+      `${API_BASE}/Prescription?start_date_from=2024-01-01&start_date_to=2026-12-31`
     );
 
     expect(response.ok()).toBeTruthy();
@@ -223,8 +223,8 @@ test.describe('API - Prescriptions CRUD', () => {
 
     // Verify dates are valid - the API uses start_date/end_date in response
     results.forEach((prescription) => {
-      const p = prescription as { start_date?: string; date_debut?: string };
-      const dateStr = p.start_date || p.date_debut;
+      const p = prescription as { start_date?: string; start_date?: string };
+      const dateStr = p.start_date || p.start_date;
       if (dateStr) {
         const date = new Date(dateStr);
         expect(date.getFullYear()).toBeGreaterThanOrEqual(2024);
@@ -252,8 +252,8 @@ test.describe('API - Prescriptions CRUD', () => {
     const invalidPrescription = {
       patient: patientId,
       medication: medicationId,
-      date_debut: '2025-07-31', // End before start
-      date_fin: '2025-07-01',
+      start_date: '2025-07-31', // End before start
+      end_date: '2025-07-01',
       status: 'valide',
     };
 

@@ -36,18 +36,14 @@ class PrescriptionReadSerializer(serializers.ModelSerializer):
 class PrescriptionWriteSerializer(serializers.ModelSerializer):
     """Serializer pour création/mise à jour - accepte les IDs."""
     
-    # Alias FR pour la compatibilité avec l'énoncé
-    date_debut = serializers.DateField(source='start_date', required=True)
-    date_fin = serializers.DateField(source='end_date', required=True)
-    
     class Meta:
         model = Prescription
         fields = [
             "id",
             "patient",
             "medication",
-            "date_debut",
-            "date_fin",
+            "start_date",
+            "end_date",
             "status",
             "comment",
         ]
@@ -66,7 +62,7 @@ class PrescriptionWriteSerializer(serializers.ModelSerializer):
         
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
-                "date_fin": "La date de fin doit être supérieure ou égale à la date de début."
+                "end_date": "La date de fin doit être supérieure ou égale à la date de début."
             })
         return data
     

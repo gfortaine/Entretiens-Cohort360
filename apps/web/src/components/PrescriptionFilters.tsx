@@ -93,41 +93,41 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Date de début - From */}
         <div className="form-group">
-          <label htmlFor="date_debut_from">{t('filters.startDate')} (≥)</label>
+          <label htmlFor="start_date_from">{t('filters.startDate')} (≥)</label>
           <input 
             type="date" 
-            id="date_debut_from" 
-            {...register('date_debut_from')} 
+            id="start_date_from" 
+            {...register('start_date_from')} 
           />
         </div>
 
         {/* Filtre Date de début - To */}
         <div className="form-group">
-          <label htmlFor="date_debut_to">{t('filters.startDate')} (≤)</label>
+          <label htmlFor="start_date_to">{t('filters.startDate')} (≤)</label>
           <input 
             type="date" 
-            id="date_debut_to" 
-            {...register('date_debut_to')} 
+            id="start_date_to" 
+            {...register('start_date_to')} 
           />
         </div>
 
         {/* Filtre Date de fin - From */}
         <div className="form-group">
-          <label htmlFor="date_fin_from">{t('filters.endDate')} (≥)</label>
+          <label htmlFor="end_date_from">{t('filters.endDate')} (≥)</label>
           <input 
             type="date" 
-            id="date_fin_from" 
-            {...register('date_fin_from')} 
+            id="end_date_from" 
+            {...register('end_date_from')} 
           />
         </div>
 
         {/* Filtre Date de fin - To */}
         <div className="form-group">
-          <label htmlFor="date_fin_to">{t('filters.endDate')} (≤)</label>
+          <label htmlFor="end_date_to">{t('filters.endDate')} (≤)</label>
           <input 
             type="date" 
-            id="date_fin_to" 
-            {...register('date_fin_to')} 
+            id="end_date_to" 
+            {...register('end_date_to')} 
           />
         </div>
       </div>

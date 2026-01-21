@@ -162,10 +162,10 @@ test.describe('Filters - Date Pickers', () => {
         
         // URL should have date filter
         const params = await prescriptionPage.getUrlParams();
-        const hasDateParam = params.has('date_debut_from') || 
-                            params.has('date_debut_to') || 
-                            params.has('date_fin_from') || 
-                            params.has('date_fin_to');
+        const hasDateParam = params.has('start_date_from') || 
+                            params.has('start_date_to') || 
+                            params.has('end_date_from') || 
+                            params.has('end_date_to');
         // Date param should be set
         expect(hasDateParam || true).toBe(true); // Soft check
       }

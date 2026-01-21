@@ -134,8 +134,8 @@ export function PrescriptionFiltersForm({
         <div className="space-y-2">
           <Label>{t('filters.startDateFrom')}</Label>
           <DatePicker
-            value={parseDate(filters.date_debut_from)}
-            onChange={(date) => updateFilter('date_debut_from', formatDate(date))}
+            value={parseDate(filters.start_date_from)}
+            onChange={(date) => updateFilter('start_date_from', formatDate(date))}
             placeholder={t('filters.selectDate')}
           />
         </div>
@@ -144,8 +144,8 @@ export function PrescriptionFiltersForm({
         <div className="space-y-2">
           <Label>{t('filters.startDateTo')}</Label>
           <DatePicker
-            value={parseDate(filters.date_debut_to)}
-            onChange={(date) => updateFilter('date_debut_to', formatDate(date))}
+            value={parseDate(filters.start_date_to)}
+            onChange={(date) => updateFilter('start_date_to', formatDate(date))}
             placeholder={t('filters.selectDate')}
           />
         </div>
@@ -154,8 +154,8 @@ export function PrescriptionFiltersForm({
         <div className="space-y-2">
           <Label>{t('filters.endDateFrom')}</Label>
           <DatePicker
-            value={parseDate(filters.date_fin_from)}
-            onChange={(date) => updateFilter('date_fin_from', formatDate(date))}
+            value={parseDate(filters.end_date_from)}
+            onChange={(date) => updateFilter('end_date_from', formatDate(date))}
             placeholder={t('filters.selectDate')}
           />
         </div>
@@ -164,8 +164,8 @@ export function PrescriptionFiltersForm({
         <div className="space-y-2">
           <Label>{t('filters.endDateTo')}</Label>
           <DatePicker
-            value={parseDate(filters.date_fin_to)}
-            onChange={(date) => updateFilter('date_fin_to', formatDate(date))}
+            value={parseDate(filters.end_date_to)}
+            onChange={(date) => updateFilter('end_date_to', formatDate(date))}
             placeholder={t('filters.selectDate')}
           />
         </div>

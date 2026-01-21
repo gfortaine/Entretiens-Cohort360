@@ -163,12 +163,12 @@ class PrescriptionAPITests(TestCase):
         data = get_results(response)
         self.assertTrue(all(p["status"] == "en_attente" for p in data))
     
-    def test_prescription_filter_by_date_debut_range(self):
+    def test_prescription_filter_by_start_date_range(self):
         """Test: Filtre par intervalle de date de début."""
         url = reverse("prescription-list")
         response = self.client.get(url, {
-            "date_debut_from": "2025-01-01",
-            "date_debut_to": "2025-01-31"
+            "start_date_from": "2025-01-01",
+            "start_date_to": "2025-01-31"
         })
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -177,12 +177,12 @@ class PrescriptionAPITests(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], self.prescription1.id)
     
-    def test_prescription_filter_by_date_fin_range(self):
+    def test_prescription_filter_by_end_date_range(self):
         """Test: Filtre par intervalle de date de fin."""
         url = reverse("prescription-list")
         response = self.client.get(url, {
-            "date_fin_from": "2025-02-01",
-            "date_fin_to": "2025-02-28"
+            "end_date_from": "2025-02-01",
+            "end_date_to": "2025-02-28"
         })
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -213,8 +213,8 @@ class PrescriptionAPITests(TestCase):
         payload = {
             "patient": self.patient1.id,
             "medication": self.medication2.id,
-            "date_debut": "2025-03-01",
-            "date_fin": "2025-04-01",
+            "start_date": "2025-03-01",
+            "end_date": "2025-04-01",
             "status": "valide",
             "comment": "Nouvelle prescription"
         }
@@ -230,13 +230,13 @@ class PrescriptionAPITests(TestCase):
         self.assertEqual(data["status"], "valide")
     
     def test_prescription_create_same_start_end_date(self):
-        """Test: Création avec date_debut = date_fin (valide)."""
+        """Test: Création avec start_date = end_date (valide)."""
         url = reverse("prescription-list")
         payload = {
             "patient": self.patient1.id,
             "medication": self.medication1.id,
-            "date_debut": "2025-05-01",
-            "date_fin": "2025-05-01",
+            "start_date": "2025-05-01",
+            "end_date": "2025-05-01",
             "status": "valide"
         }
         
@@ -245,28 +245,28 @@ class PrescriptionAPITests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
     def test_prescription_create_fails_end_before_start(self):
-        """Test: Erreur si date_fin < date_debut."""
+        """Test: Erreur si end_date < start_date."""
         url = reverse("prescription-list")
         payload = {
             "patient": self.patient1.id,
             "medication": self.medication1.id,
-            "date_debut": "2025-03-15",
-            "date_fin": "2025-03-01",  # Avant date_debut
+            "start_date": "2025-03-15",
+            "end_date": "2025-03-01",  # Avant start_date
             "status": "valide"
         }
         
         response = self.client.post(url, payload, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("date_fin", response.json())
+        self.assertIn("end_date", response.json())
     
     def test_prescription_create_fails_missing_patient(self):
         """Test: Erreur si patient manquant."""
         url = reverse("prescription-list")
         payload = {
             "medication": self.medication1.id,
-            "date_debut": "2025-03-01",
-            "date_fin": "2025-04-01",
+            "start_date": "2025-03-01",
+            "end_date": "2025-04-01",
             "status": "valide"
         }
         
@@ -280,8 +280,8 @@ class PrescriptionAPITests(TestCase):
         url = reverse("prescription-list")
         payload = {
             "patient": self.patient1.id,
-            "date_debut": "2025-03-01",
-            "date_fin": "2025-04-01",
+            "start_date": "2025-03-01",
+            "end_date": "2025-04-01",
             "status": "valide"
         }
         
@@ -296,8 +296,8 @@ class PrescriptionAPITests(TestCase):
         payload = {
             "patient": 99999,  # ID inexistant
             "medication": self.medication1.id,
-            "date_debut": "2025-03-01",
-            "date_fin": "2025-04-01",
+            "start_date": "2025-03-01",
+            "end_date": "2025-04-01",
             "status": "valide"
         }
         
@@ -311,8 +311,8 @@ class PrescriptionAPITests(TestCase):
         payload = {
             "patient": self.patient1.id,
             "medication": self.medication1.id,
-            "date_debut": "2025-06-01",
-            "date_fin": "2025-06-30",
+            "start_date": "2025-06-01",
+            "end_date": "2025-06-30",
             "status": "en_attente"
         }
         
@@ -329,8 +329,8 @@ class PrescriptionAPITests(TestCase):
         payload = {
             "patient": self.patient2.id,
             "medication": self.medication2.id,
-            "date_debut": "2025-07-01",
-            "date_fin": "2025-08-01",
+            "start_date": "2025-07-01",
+            "end_date": "2025-08-01",
             "status": "suppr",
             "comment": "Prescription mise à jour"
         }
@@ -358,10 +358,10 @@ class PrescriptionAPITests(TestCase):
         self.assertEqual(data["patient"]["id"], self.patient1.id)
     
     def test_prescription_update_fails_end_before_start(self):
-        """Test: Erreur de mise à jour si date_fin < date_debut."""
+        """Test: Erreur de mise à jour si end_date < start_date."""
         url = reverse("prescription-detail", args=[self.prescription1.id])
         payload = {
-            "date_fin": "2024-12-01"  # Avant la date de début existante (2025-01-01)
+            "end_date": "2024-12-01"  # Avant la date de début existante (2025-01-01)
         }
         
         response = self.client.patch(url, payload, format='json')

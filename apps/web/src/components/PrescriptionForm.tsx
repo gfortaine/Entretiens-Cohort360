@@ -7,17 +7,17 @@ import type { PrescriptionStatus } from '../types';
 const prescriptionSchema = z.object({
   patient: z.coerce.number().min(1, 'Le patient est requis'),
   medication: z.coerce.number().min(1, 'Le médicament est requis'),
-  date_debut: z.string().min(1, 'La date de début est requise'),
-  date_fin: z.string().min(1, 'La date de fin est requise'),
+  start_date: z.string().min(1, 'La date de début est requise'),
+  end_date: z.string().min(1, 'La date de fin est requise'),
   status: z.enum(['valide', 'en_attente', 'suppr'] as const),
   comment: z.string().optional().nullable(),
 }).refine((data) => {
-  const startDate = new Date(data.date_debut);
-  const endDate = new Date(data.date_fin);
+  const startDate = new Date(data.start_date);
+  const endDate = new Date(data.end_date);
   return endDate >= startDate;
 }, {
   message: 'La date de fin doit être supérieure ou égale à la date de début',
-  path: ['date_fin'],
+  path: ['end_date'],
 });
 
 type PrescriptionFormData = z.infer<typeof prescriptionSchema>;
@@ -47,8 +47,8 @@ export function PrescriptionForm({ onSuccess }: PrescriptionFormProps) {
     defaultValues: {
       patient: 0,
       medication: 0,
-      date_debut: '',
-      date_fin: '',
+      start_date: '',
+      end_date: '',
       status: 'valide' as const,
       comment: '',
     },
@@ -130,29 +130,29 @@ export function PrescriptionForm({ onSuccess }: PrescriptionFormProps) {
 
         {/* Date de début */}
         <div className="form-group">
-          <label htmlFor="form-date-debut">Date de début *</label>
+          <label htmlFor="form-start-date">Date de début *</label>
           <input
             type="date"
-            id="form-date-debut"
-            {...register('date_debut')}
-            aria-invalid={!!errors.date_debut}
+            id="form-start-date"
+            {...register('start_date')}
+            aria-invalid={!!errors.start_date}
           />
-          {errors.date_debut && (
-            <span className="error-message">{errors.date_debut.message}</span>
+          {errors.start_date && (
+            <span className="error-message">{errors.start_date.message}</span>
           )}
         </div>
 
         {/* Date de fin */}
         <div className="form-group">
-          <label htmlFor="form-date-fin">Date de fin *</label>
+          <label htmlFor="form-end-date">Date de fin *</label>
           <input
             type="date"
-            id="form-date-fin"
-            {...register('date_fin')}
-            aria-invalid={!!errors.date_fin}
+            id="form-end-date"
+            {...register('end_date')}
+            aria-invalid={!!errors.end_date}
           />
-          {errors.date_fin && (
-            <span className="error-message">{errors.date_fin.message}</span>
+          {errors.end_date && (
+            <span className="error-message">{errors.end_date.message}</span>
           )}
         </div>
 

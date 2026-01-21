@@ -35,8 +35,8 @@ export interface Prescription {
 export interface PrescriptionCreateDTO {
   patient: number;
   medication: number;
-  date_debut: string;
-  date_fin: string;
+  start_date: string;
+  end_date: string;
   status: PrescriptionStatus;
   comment?: string | null;
 }
@@ -49,10 +49,10 @@ export interface PrescriptionFilters {
   patient?: number;
   medication?: number;
   status?: PrescriptionStatus;
-  date_debut_from?: string;
-  date_debut_to?: string;
-  date_fin_from?: string;
-  date_fin_to?: string;
+  start_date_from?: string;
+  start_date_to?: string;
+  end_date_from?: string;
+  end_date_to?: string;
 }
 
 // ========== Pagination (OpenAI-style, 20 per page) ==========

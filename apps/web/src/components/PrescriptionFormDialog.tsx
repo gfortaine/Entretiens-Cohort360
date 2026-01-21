@@ -33,8 +33,8 @@ interface PrescriptionFormDialogProps {
 interface FormData {
   patient: string;
   medication: string;
-  date_debut: string;
-  date_fin: string;
+  start_date: string;
+  end_date: string;
   status: PrescriptionStatus;
   comment: string;
 }
@@ -42,8 +42,8 @@ interface FormData {
 const initialFormData: FormData = {
   patient: '',
   medication: '',
-  date_debut: new Date().toISOString().split('T')[0],
-  date_fin: '',
+  start_date: new Date().toISOString().split('T')[0],
+  end_date: '',
   status: 'valide',
   comment: '',
 };
@@ -76,8 +76,8 @@ export function PrescriptionFormDialog({
     mutation.mutate({
       patient: Number(formData.patient),
       medication: Number(formData.medication),
-      date_debut: formData.date_debut,
-      date_fin: formData.date_fin,
+      start_date: formData.start_date,
+      end_date: formData.end_date,
       status: formData.status,
       comment: formData.comment || null,
     });
@@ -90,8 +90,8 @@ export function PrescriptionFormDialog({
   const isValid =
     formData.patient &&
     formData.medication &&
-    formData.date_debut &&
-    formData.date_fin;
+    formData.start_date &&
+    formData.end_date;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,8 +151,8 @@ export function PrescriptionFormDialog({
               <Input
                 id="form-start-date"
                 type="date"
-                value={formData.date_debut}
-                onChange={(e) => updateField('date_debut', e.target.value)}
+                value={formData.start_date}
+                onChange={(e) => updateField('start_date', e.target.value)}
               />
             </div>
 
@@ -162,8 +162,8 @@ export function PrescriptionFormDialog({
               <Input
                 id="form-end-date"
                 type="date"
-                value={formData.date_fin}
-                onChange={(e) => updateField('date_fin', e.target.value)}
+                value={formData.end_date}
+                onChange={(e) => updateField('end_date', e.target.value)}
               />
             </div>
           </div>

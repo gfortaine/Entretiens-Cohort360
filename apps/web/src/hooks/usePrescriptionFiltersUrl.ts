@@ -33,23 +33,23 @@ export function usePrescriptionFiltersUrl() {
   );
 
   // Date filters (YYYY-MM-DD format)
-  const [dateDebutFrom, setDateDebutFrom] = useQueryState(
-    'date_debut_from',
+  const [startDateFrom, setStartDateFrom] = useQueryState(
+    'start_date_from',
     parseAsString.withOptions({ shallow: false })
   );
 
-  const [dateDebutTo, setDateDebutTo] = useQueryState(
-    'date_debut_to',
+  const [startDateTo, setStartDateTo] = useQueryState(
+    'start_date_to',
     parseAsString.withOptions({ shallow: false })
   );
 
-  const [dateFinFrom, setDateFinFrom] = useQueryState(
-    'date_fin_from',
+  const [endDateFrom, setEndDateFrom] = useQueryState(
+    'end_date_from',
     parseAsString.withOptions({ shallow: false })
   );
 
-  const [dateFinTo, setDateFinTo] = useQueryState(
-    'date_fin_to',
+  const [endDateTo, setEndDateTo] = useQueryState(
+    'end_date_to',
     parseAsString.withOptions({ shallow: false })
   );
 
@@ -65,12 +65,12 @@ export function usePrescriptionFiltersUrl() {
     if (patient !== null) f.patient = patient;
     if (medication !== null) f.medication = medication;
     if (status !== null) f.status = status;
-    if (dateDebutFrom) f.date_debut_from = dateDebutFrom;
-    if (dateDebutTo) f.date_debut_to = dateDebutTo;
-    if (dateFinFrom) f.date_fin_from = dateFinFrom;
-    if (dateFinTo) f.date_fin_to = dateFinTo;
+    if (startDateFrom) f.start_date_from = startDateFrom;
+    if (startDateTo) f.start_date_to = startDateTo;
+    if (endDateFrom) f.end_date_from = endDateFrom;
+    if (endDateTo) f.end_date_to = endDateTo;
     return f;
-  }, [patient, medication, status, dateDebutFrom, dateDebutTo, dateFinFrom, dateFinTo]);
+  }, [patient, medication, status, startDateFrom, startDateTo, endDateFrom, endDateTo]);
 
   // Update filters and reset page to 1
   const setFilters = useCallback(
@@ -80,10 +80,10 @@ export function usePrescriptionFiltersUrl() {
         setPatient(newFilters.patient ?? null),
         setMedication(newFilters.medication ?? null),
         setStatus(newFilters.status ?? null),
-        setDateDebutFrom(newFilters.date_debut_from ?? null),
-        setDateDebutTo(newFilters.date_debut_to ?? null),
-        setDateFinFrom(newFilters.date_fin_from ?? null),
-        setDateFinTo(newFilters.date_fin_to ?? null),
+        setStartDateFrom(newFilters.start_date_from ?? null),
+        setStartDateTo(newFilters.start_date_to ?? null),
+        setEndDateFrom(newFilters.end_date_from ?? null),
+        setEndDateTo(newFilters.end_date_to ?? null),
         setPage(1), // Reset to page 1 when filters change
       ]);
     },
@@ -91,10 +91,10 @@ export function usePrescriptionFiltersUrl() {
       setPatient,
       setMedication,
       setStatus,
-      setDateDebutFrom,
-      setDateDebutTo,
-      setDateFinFrom,
-      setDateFinTo,
+      setStartDateFrom,
+      setStartDateTo,
+      setEndDateFrom,
+      setEndDateTo,
       setPage,
     ]
   );

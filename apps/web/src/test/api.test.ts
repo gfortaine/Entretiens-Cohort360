@@ -78,8 +78,8 @@ describe('API Prescriptions', () => {
       const newPrescription = {
         patient: 1,
         medication: 1,
-        date_debut: '2025-03-01',
-        date_fin: '2025-04-01',
+        start_date: '2025-03-01',
+        end_date: '2025-04-01',
         status: 'valide' as const,
         comment: 'Nouveau',
       };
@@ -110,12 +110,14 @@ describe('API Prescriptions', () => {
   });
 
   describe('delete', () => {
-    it('supprime une prescription', async () => {
-      (apiClient.delete as ReturnType<typeof vi.fn>).mockResolvedValue({});
+    it('soft delete une prescription (PATCH status=suppr)', async () => {
+      const deletedPrescription = { ...mockPrescriptions[0], status: 'suppr' };
+      (apiClient.patch as ReturnType<typeof vi.fn>).mockResolvedValue({ data: deletedPrescription });
       
-      await prescriptionsApi.delete(1);
+      const result = await prescriptionsApi.delete(1);
       
-      expect(apiClient.delete).toHaveBeenCalledWith('/Prescription/1');
+      expect(apiClient.patch).toHaveBeenCalledWith('/Prescription/1', { status: 'suppr' });
+      expect(result.status).toBe('suppr');
     });
   });
 });
