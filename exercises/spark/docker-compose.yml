@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  solr:
+    image: solr:8.11.2
+    container_name: solr_test_exercise
+    ports:
+      - "8983:8983"
+      - "9983:9983"
+    volumes:
+      - ./init_solr.sh:/docker-entrypoint-initdb.d/init_solr.sh
+    environment:
+      - SOLR_JAVA_MEM=-Xms512m -Xmx512m
+    command: solr-foreground -c

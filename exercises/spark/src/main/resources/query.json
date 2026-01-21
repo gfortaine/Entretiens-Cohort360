@@ -1,0 +1,20 @@
+{
+  "Perimeters": ["Organization/aphp-psl"],
+  "Criteria": [
+    {
+      "Resource": "Patient",
+      "Include": "true",
+      "searchParams": "birthDate=ge2005-01-01&gender=male&active=true"
+    },
+    {
+      "Resource": "Encounter",
+      "Include": "true",
+      "searchParams": "length=lt12"
+    },
+    {
+      "Resource": "DocumentReference",
+      "Include": "false",
+      "searchParams": "description=cancer"
+    }
+  ]
+}
