@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* ========== AP-HP Design Tokens + shadcn/ui Colors ========== */
+@theme {
+  /* AP-HP Brand Colors */
+  --color-primary: #0063AF;
+  --color-primary-dark: #004d8a;
+  --color-primary-light: #e6f0fa;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #ED6D91;
+  --color-secondary-foreground: #ffffff;
+  
+  --color-accent: #5BC5F2;
+  --color-accent-foreground: #153D8A;
+  
+  /* Semantic Colors */
+  --color-success: #22c55e;
+  --color-success-light: #dcfce7;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  /* shadcn/ui semantic colors */
+  --color-background: #ffffff;
+  --color-foreground: #153D8A;
+  
+  --color-card: #ffffff;
+  --color-card-foreground: #153D8A;
+  
+  --color-popover: #ffffff;
+  --color-popover-foreground: #153D8A;
+  
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #0063AF;
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  
+  /* Border Radius */
+  --radius: 0.5rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Font Families */
+  --font-heading: 'Montserrat', system-ui, sans-serif;
+  --font-body: 'Open Sans', system-ui, sans-serif;
+}
+
+/* ========== Base Styles ========== */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+}
