@@ -168,18 +168,14 @@ function PrescriptionApp() {
                 <>
                   <PrescriptionTable 
                     prescriptions={prescriptions} 
-                    isLoading={isLoading} 
+                    isLoading={isLoading}
+                    pagination={totalCount > DEFAULT_PAGE_SIZE ? {
+                      page,
+                      pageSize: DEFAULT_PAGE_SIZE,
+                      total: totalCount,
+                      onPageChange: handlePageChange,
+                    } : undefined}
                   />
-                  
-                  {totalPages > 1 && (
-                    <div className="mt-6">
-                      <AppPagination
-                        currentPage={page}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                      />
-                    </div>
-                  )}
                 </>
               )}
             </CardContent>
