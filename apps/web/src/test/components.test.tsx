@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PrescriptionList } from '../components/PrescriptionList';
 import { PrescriptionFilters } from '../components/PrescriptionFilters';
+import { PrescriptionTable } from '../components/PrescriptionTable';
 import type { Prescription } from '../types';
 
 // Mock data
@@ -186,5 +187,120 @@ describe('Intégration', () => {
     // Vérifie que les sélecteurs de statut sont présents
     const statusSelects = screen.getAllByRole('combobox');
     expect(statusSelects.length).toBeGreaterThan(0);
+  });
+});
+
+// ========== Tests PrescriptionTable (TanStack Table) ==========
+describe('PrescriptionTable', () => {
+  it('affiche le total avec pagination même sur une seule page', () => {
+    render(
+      <PrescriptionTable 
+        prescriptions={mockPrescriptions} 
+        isLoading={false}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: 2,
+          onPageChange: vi.fn(),
+        }}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    // REGRESSION TEST: Total count should always be visible
+    expect(screen.getByText(/Affichage de 1 à 2 sur 2/)).toBeInTheDocument();
+  });
+
+  it('affiche le sélecteur de statut éditable', () => {
+    const onStatusChange = vi.fn();
+    
+    render(
+      <PrescriptionTable 
+        prescriptions={mockPrescriptions} 
+        isLoading={false}
+        onStatusChange={onStatusChange}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    // REGRESSION TEST: Status should be editable (combobox/select)
+    const statusSelects = screen.getAllByRole('combobox');
+    expect(statusSelects.length).toBe(mockPrescriptions.length);
+  });
+
+  it('appelle onStatusChange quand le statut est modifié', () => {
+    const onStatusChange = vi.fn();
+    
+    render(
+      <PrescriptionTable 
+        prescriptions={mockPrescriptions} 
+        isLoading={false}
+        onStatusChange={onStatusChange}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    // Find the first status select and change it
+    const statusSelects = screen.getAllByRole('combobox');
+    fireEvent.change(statusSelects[0], { target: { value: 'suppr' } });
+    
+    // REGRESSION TEST: onStatusChange should be called with correct args
+    expect(onStatusChange).toHaveBeenCalledWith(mockPrescriptions[0].id, 'suppr');
+  });
+
+  it('désactive les sélecteurs de statut pendant la mise à jour', () => {
+    render(
+      <PrescriptionTable 
+        prescriptions={mockPrescriptions} 
+        isLoading={false}
+        onStatusChange={vi.fn()}
+        isUpdating={true}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    const statusSelects = screen.getAllByRole('combobox');
+    statusSelects.forEach(select => {
+      expect(select).toBeDisabled();
+    });
+  });
+
+  it('affiche le total correct quand des filtres réduisent les résultats', () => {
+    // Simulate filtered results (1 prescription)
+    render(
+      <PrescriptionTable 
+        prescriptions={[mockPrescriptions[0]]} 
+        isLoading={false}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: 1,
+          onPageChange: vi.fn(),
+        }}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    // REGRESSION TEST: Should show "Affichage de 1 à 1 sur 1" even with single result
+    expect(screen.getByText(/Affichage de 1 à 1 sur 1/)).toBeInTheDocument();
+  });
+
+  it('affiche 0 résultats correctement', () => {
+    render(
+      <PrescriptionTable 
+        prescriptions={[]} 
+        isLoading={false}
+        pagination={{
+          page: 1,
+          pageSize: 10,
+          total: 0,
+          onPageChange: vi.fn(),
+        }}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    // Should show "Affichage de 0 à 0 sur 0"
+    expect(screen.getByText(/Affichage de 0 à 0 sur 0/)).toBeInTheDocument();
   });
 });

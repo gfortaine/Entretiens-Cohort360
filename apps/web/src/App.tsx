@@ -13,9 +13,9 @@ import { PrescriptionFormDialog } from '@/components/PrescriptionFormDialog';
 import { AppPagination } from '@/components/AppPagination';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-import { usePrescriptions } from '@/hooks/usePrescriptions';
+import { usePrescriptions, useUpdatePrescription } from '@/hooks/usePrescriptions';
 import { usePrescriptionFiltersUrl } from '@/hooks/usePrescriptionFiltersUrl';
-import { DEFAULT_PAGE_SIZE } from '@/types';
+import { DEFAULT_PAGE_SIZE, type PrescriptionStatus } from '@/types';
 import logoAphp from '@/assets/logo-aphp-white.png';
 
 const queryClient = new QueryClient({
@@ -34,10 +34,19 @@ function PrescriptionApp() {
   const [showFilters, setShowFilters] = useState(true);
   
   const { data, isLoading, error, refetch } = usePrescriptions(filters, { page });
+  const updateMutation = useUpdatePrescription();
   
   const prescriptions = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
+
+  const handleStatusChange = async (prescriptionId: number, newStatus: PrescriptionStatus) => {
+    try {
+      await updateMutation.mutateAsync({ id: prescriptionId, data: { status: newStatus } });
+    } catch (error) {
+      console.error('Status update failed:', error);
+    }
+  };
 
   const handleFiltersChange = (newFilters: typeof filters) => {
     setFilters(newFilters);
@@ -169,12 +178,14 @@ function PrescriptionApp() {
                   <PrescriptionTable 
                     prescriptions={prescriptions} 
                     isLoading={isLoading}
-                    pagination={totalCount > DEFAULT_PAGE_SIZE ? {
+                    pagination={{
                       page,
                       pageSize: DEFAULT_PAGE_SIZE,
                       total: totalCount,
                       onPageChange: handlePageChange,
-                    } : undefined}
+                    }}
+                    onStatusChange={handleStatusChange}
+                    isUpdating={updateMutation.isPending}
                   />
                 </>
               )}

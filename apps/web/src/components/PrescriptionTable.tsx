@@ -2,15 +2,15 @@
  * PrescriptionTable Component
  *
  * Displays prescriptions using TanStack Table via the DataTable component.
- * Supports sorting, pagination, and row actions.
+ * Supports sorting, pagination, inline status editing, and row actions.
  */
 
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, User, Pill } from 'lucide-react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, StatusBadge } from '@/components/DataTable';
-import type { Prescription } from '@/types';
+import { DataTable, StatusSelect } from '@/components/DataTable';
+import type { Prescription, PrescriptionStatus } from '@/types';
 
 interface PrescriptionTableProps {
   prescriptions: Prescription[];
@@ -22,6 +22,8 @@ interface PrescriptionTableProps {
     onPageChange: (page: number) => void;
   };
   onRowClick?: (prescription: Prescription) => void;
+  onStatusChange?: (prescriptionId: number, newStatus: PrescriptionStatus) => void;
+  isUpdating?: boolean;
 }
 
 function formatDate(dateStr: string): string {
@@ -37,6 +39,8 @@ export function PrescriptionTable({
   isLoading,
   pagination,
   onRowClick,
+  onStatusChange,
+  isUpdating = false,
 }: PrescriptionTableProps) {
   const { t } = useTranslation();
 
@@ -113,7 +117,13 @@ export function PrescriptionTable({
       {
         accessorKey: 'status',
         header: t('table.status'),
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => (
+          <StatusSelect
+            status={row.original.status}
+            onStatusChange={(newStatus) => onStatusChange?.(row.original.id, newStatus)}
+            disabled={isUpdating || !onStatusChange}
+          />
+        ),
       },
       {
         accessorKey: 'comment',
@@ -125,7 +135,7 @@ export function PrescriptionTable({
         ),
       },
     ],
-    [t]
+    [t, onStatusChange, isUpdating]
   );
 
   return (

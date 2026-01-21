@@ -159,36 +159,38 @@ export function DataTable<T>({
       </div>
 
       {/* Pagination */}
-      {pagination && totalPages > 1 && (
+      {pagination && (
         <div className="flex items-center justify-between px-4 py-3 bg-card border rounded-lg">
           <div className="text-sm text-muted-foreground">
             {t('pagination.showing', {
-              from: (pagination.page - 1) * pagination.pageSize + 1,
+              from: pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1,
               to: Math.min(pagination.page * pagination.pageSize, pagination.total),
               total: pagination.total,
             })}
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page <= 1}
-              onClick={() => pagination.onPageChange(pagination.page - 1)}
-            >
-              {t('pagination.previous')}
-            </Button>
-            <span className="flex items-center px-3 text-sm text-muted-foreground">
-              {t('pagination.pageOf', { page: pagination.page, total: totalPages })}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={pagination.page >= totalPages}
-              onClick={() => pagination.onPageChange(pagination.page + 1)}
-            >
-              {t('pagination.next')}
-            </Button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={pagination.page <= 1}
+                onClick={() => pagination.onPageChange(pagination.page - 1)}
+              >
+                {t('pagination.previous')}
+              </Button>
+              <span className="flex items-center px-3 text-sm text-muted-foreground">
+                {t('pagination.pageOf', { page: pagination.page, total: totalPages })}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={pagination.page >= totalPages}
+                onClick={() => pagination.onPageChange(pagination.page + 1)}
+              >
+                {t('pagination.next')}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -196,12 +198,18 @@ export function DataTable<T>({
 }
 
 /**
- * StatusBadge - Helper component for prescription status
+ * StatusBadge - Display-only status badge
  */
 const statusColors: Record<string, string> = {
   valide: 'bg-emerald-500 hover:bg-emerald-600',
   en_attente: 'bg-amber-500 hover:bg-amber-600',
   suppr: 'bg-red-500 hover:bg-red-600',
+};
+
+const statusSelectColors: Record<string, string> = {
+  valide: '#22c55e',
+  en_attente: '#f59e0b',
+  suppr: '#ef4444',
 };
 
 export function StatusBadge({
@@ -215,5 +223,45 @@ export function StatusBadge({
     <Badge className={`${statusColors[status] || 'bg-gray-500'} text-white`}>
       {t(`status.${status}`)}
     </Badge>
+  );
+}
+
+/**
+ * StatusSelect - Editable status selector for prescriptions
+ */
+export function StatusSelect({
+  status,
+  onStatusChange,
+  disabled = false,
+}: {
+  status: 'valide' | 'en_attente' | 'suppr';
+  onStatusChange: (newStatus: 'valide' | 'en_attente' | 'suppr') => void;
+  disabled?: boolean;
+}) {
+  const { t } = useTranslation();
+  
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.stopPropagation(); // Prevent row click
+    onStatusChange(e.target.value as 'valide' | 'en_attente' | 'suppr');
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click when clicking select
+  };
+  
+  return (
+    <select
+      value={status}
+      onChange={handleChange}
+      onClick={handleClick}
+      disabled={disabled}
+      className="rounded px-2 py-1 text-white text-sm font-medium cursor-pointer border-none focus:outline-none focus:ring-2 focus:ring-offset-1"
+      style={{ backgroundColor: statusSelectColors[status] }}
+      aria-label={t('table.status')}
+    >
+      <option value="valide">{t('status.valide')}</option>
+      <option value="en_attente">{t('status.en_attente')}</option>
+      <option value="suppr">{t('status.suppr')}</option>
+    </select>
   );
 }
