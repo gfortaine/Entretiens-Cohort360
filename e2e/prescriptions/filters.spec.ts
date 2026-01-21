@@ -67,7 +67,6 @@ test.describe('Filters - Status Filter', () => {
     // Just verify no error occurred
     await expect(prescriptionPage.prescriptionTable).toBeVisible();
     
-    await prescriptionPage.takeScreenshot('filter-status-valide');
   });
 
   test('should filter by "en_attente" status', async ({ prescriptionPage, page }) => {
@@ -76,7 +75,6 @@ test.describe('Filters - Status Filter', () => {
     
     await expect(prescriptionPage.prescriptionTable).toBeVisible();
     
-    await prescriptionPage.takeScreenshot('filter-status-pending');
   });
 
   test('should show all when selecting "all" status', async ({ prescriptionPage, page }) => {
@@ -267,7 +265,6 @@ test.describe('Filters - Combined Filters', () => {
     expect(params.get('status')).toBe('valide');
     // Patient should also be set if we selected one
     
-    await prescriptionPage.takeScreenshot('filter-combined');
   });
 
   test('should maintain filter state after page refresh', async ({ prescriptionPage, page }) => {

@@ -19,10 +19,6 @@ test.describe('Prescription App - Page Load', () => {
     await expect(prescriptionPage.toggleFiltersButton).toBeVisible();
     await expect(prescriptionPage.prescriptionTable).toBeVisible();
 
-    // Take screenshot for documentation
-    await page.screenshot({
-      path: 'screenshots/01-app-loaded.png',
-      fullPage: true,
     });
   });
 
@@ -52,7 +48,6 @@ test.describe('Prescription Form - Dialog', () => {
     await expect(prescriptionPage.dialog).toBeVisible();
     await expect(prescriptionPage.dialogSubmitButton).toBeVisible();
     
-    await prescriptionPage.takeScreenshot('02-new-prescription-dialog');
   });
 
   test('should close dialog on cancel', async ({ prescriptionPage }) => {
@@ -102,10 +97,6 @@ test.describe('Prescription CRUD - Create', () => {
     await prescriptionPage.dialogStatusSelect.click();
     await page.getByRole('option', { name: /valide|valid/i }).click();
 
-    // Screenshot before submission
-    await page.screenshot({
-      path: 'screenshots/04-form-filled.png',
-      fullPage: true,
     });
 
     // Submit the form
@@ -114,9 +105,6 @@ test.describe('Prescription CRUD - Create', () => {
     // Wait for success (dialog closes)
     await prescriptionPage.waitForSuccess();
 
-    await page.screenshot({
-      path: 'screenshots/05-creation-success.png',
-      fullPage: true,
     });
 
     // Verify prescription was added (or at least no error)
@@ -135,9 +123,6 @@ test.describe('Prescription CRUD - Read', () => {
 
     expect(hasRows || hasEmpty).toBe(true);
 
-    await page.screenshot({
-      path: 'screenshots/06-prescription-list.png',
-      fullPage: true,
     });
   });
 
@@ -178,9 +163,6 @@ test.describe('Prescription Filters - Legacy', () => {
     const params = await prescriptionPage.getUrlParams();
     expect(params.get('status')).toBe('valide');
 
-    await page.screenshot({
-      path: 'screenshots/07-filtered-by-status.png',
-      fullPage: true,
     });
   });
 
@@ -197,9 +179,6 @@ test.describe('Prescription Filters - Legacy', () => {
     const params = await prescriptionPage.getUrlParams();
     expect(params.get('status')).toBeNull();
 
-    await page.screenshot({
-      path: 'screenshots/08-filters-cleared.png',
-      fullPage: true,
     });
   });
 });
@@ -255,9 +234,6 @@ test.describe('Mobile Responsiveness', () => {
     await expect(prescriptionPage.heading).toBeVisible();
     await expect(prescriptionPage.newPrescriptionButton).toBeVisible();
 
-    await page.screenshot({
-      path: 'screenshots/09-mobile-view.png',
-      fullPage: true,
     });
   });
   
@@ -267,7 +243,6 @@ test.describe('Mobile Responsiveness', () => {
     // Filters should still be visible and usable
     await expect(prescriptionPage.filterCard).toBeVisible();
     
-    await prescriptionPage.takeScreenshot('mobile-filters');
   });
 });
 
@@ -296,9 +271,5 @@ test.describe('Error Handling', () => {
     const hasContent = await page.locator('body').textContent();
     expect(hasContent).toBeTruthy();
 
-    await page.screenshot({
-      path: 'screenshots/10-error-state.png',
-      fullPage: true,
     });
   });
-});

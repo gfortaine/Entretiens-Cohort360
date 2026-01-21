@@ -277,13 +277,6 @@ export class PrescriptionPage {
     return this.tableRows.nth(index);
   }
 
-  async takeScreenshot(name: string) {
-    await this.page.screenshot({
-      path: `screenshots/${name}.png`,
-      fullPage: true,
-    });
-  }
-
   async deletePrescription(index: number) {
     const row = await this.getTableRowByIndex(index);
     const deleteButton = row.getByRole('button', { name: /supprimer|delete/i });
