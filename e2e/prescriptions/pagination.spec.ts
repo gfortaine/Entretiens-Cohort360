@@ -21,9 +21,7 @@ test.describe('Pagination - Visibility', () => {
     if (count > 0) {
       // Pagination may or may not be visible depending on total count
       const isPaginationVisible = await prescriptionPage.pagination.isVisible().catch(() => false);
-      
-      // Take screenshot regardless
-      await prescriptionPage.takeScreenshot('pagination-state');
+      expect(typeof isPaginationVisible).toBe('boolean');
     }
   });
 

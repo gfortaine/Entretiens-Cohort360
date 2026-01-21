@@ -18,8 +18,6 @@ test.describe('Prescription App - Page Load', () => {
     await expect(prescriptionPage.newPrescriptionButton).toBeVisible();
     await expect(prescriptionPage.toggleFiltersButton).toBeVisible();
     await expect(prescriptionPage.prescriptionTable).toBeVisible();
-
-    });
   });
 
   test('should load patients and medications from API', async ({ prescriptionPage, page }) => {
@@ -97,15 +95,11 @@ test.describe('Prescription CRUD - Create', () => {
     await prescriptionPage.dialogStatusSelect.click();
     await page.getByRole('option', { name: /valide|valid/i }).click();
 
-    });
-
     // Submit the form
     await prescriptionPage.dialogSubmitButton.click();
 
     // Wait for success (dialog closes)
     await prescriptionPage.waitForSuccess();
-
-    });
 
     // Verify prescription was added (or at least no error)
     await expect(prescriptionPage.prescriptionTable).toBeVisible();
@@ -122,8 +116,6 @@ test.describe('Prescription CRUD - Read', () => {
     const hasEmpty = await prescriptionPage.emptyState.isVisible().catch(() => false);
 
     expect(hasRows || hasEmpty).toBe(true);
-
-    });
   });
 
   test('should show prescription details in table rows', async ({ prescriptionPage }) => {
@@ -162,8 +154,6 @@ test.describe('Prescription Filters - Legacy', () => {
     // URL should contain status filter
     const params = await prescriptionPage.getUrlParams();
     expect(params.get('status')).toBe('valide');
-
-    });
   });
 
   test('should clear all filters', async ({ prescriptionPage, page }) => {
@@ -178,8 +168,6 @@ test.describe('Prescription Filters - Legacy', () => {
     // URL should be clean
     const params = await prescriptionPage.getUrlParams();
     expect(params.get('status')).toBeNull();
-
-    });
   });
 });
 
@@ -233,8 +221,6 @@ test.describe('Mobile Responsiveness', () => {
     // Verify main elements are still visible
     await expect(prescriptionPage.heading).toBeVisible();
     await expect(prescriptionPage.newPrescriptionButton).toBeVisible();
-
-    });
   });
   
   test('should stack filters on mobile', async ({ prescriptionPage, page }) => {
@@ -270,6 +256,5 @@ test.describe('Error Handling', () => {
     // Verify app didn't crash entirely - some UI should still exist
     const hasContent = await page.locator('body').textContent();
     expect(hasContent).toBeTruthy();
-
-    });
   });
+});
