@@ -19,8 +19,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "test:api": "playwright test e2e/api/",
-    "screenshot": "mkdir -p screenshots && playwright test e2e/prescriptions/ --update-snapshots"
+    "test:api": "playwright test e2e/api/"
   },
   "repository": {
     "type": "git",
