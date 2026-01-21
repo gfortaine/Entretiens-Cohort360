@@ -1,60 +1,66 @@
-Exercice Django — API REST Patients & Médicaments (+ Prescription à implémenter)
+# Exercice Django — API REST Patients, Médicaments & Prescriptions
 
-Présentation
-------------
-Base de projet Django + Django REST Framework pour lister des Patients et des Médicaments.
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/)
+[![Django 5.2 LTS](https://img.shields.io/badge/Django-5.2%20LTS-green.svg)](https://docs.djangoproject.com/en/5.2/)
+[![uv](https://img.shields.io/badge/uv-0.7+-orange.svg)](https://docs.astral.sh/uv/)
+[![Tests: 29 passing](https://img.shields.io/badge/tests-29%20passing-brightgreen.svg)](medical/tests/)
 
-But de l'exercice candidat: ajouter une nouvelle ressource « Prescription » avec une API REST (lecture + création + mise
-à jour) et des possibilités de filtrage.
+> API REST pour la gestion des prescriptions médicamenteuses des patients.
 
+## 📋 Table des matières
 
-Installation des Prérequis
----------
-Le projet utilise Python 3.10 et Django 4.0.
-Avant tout, vous devez vous placer dans le répertoire `Exercice_Django`.
+- [Stack technique](#stack-technique)
+- [Installation rapide (uv)](#installation-rapide-uv)
+- [Installation classique (pip)](#installation-classique-pip)
+- [Endpoints API](#endpoints-api)
+- [Tests](#tests)
+- [Développement](#développement)
 
-### Python et pip
+## Stack technique
 
-- **Vérifier l'installation:**
+| Composant | Version | Notes |
+|-----------|---------|-------|
+| Python | 3.12 | Pinned via `.python-version` |
+| Django | 5.2 LTS | Support jusqu'à avril 2028 |
+| DRF | 3.15+ | Django REST Framework |
+| uv | 0.7+ | Gestionnaire de paquets Rust-based |
+| ruff | 0.9+ | Linting & formatting |
+| mypy | 1.14+ | Type checking avec django-stubs |
+| pytest | 9.0+ | Testing avec pytest-django |
+
+## Installation rapide (uv)
+
+> **Recommandé** - Installation en moins de 30 secondes avec [uv](https://docs.astral.sh/uv/)
 
 ```bash
-python3 --version
-pip3 --version
+# 1. Installer uv (si pas déjà installé)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Cloner et installer
+cd Exercice_Django
+uv sync --all-extras
+
+# 3. Initialiser la base de données
+uv run python manage.py migrate
+uv run python manage.py seed_demo --patients 100 --medications 30
+
+# 4. Lancer le serveur
+uv run python manage.py runserver
 ```
 
-### Installation de Python et pip
+Ouvrir http://127.0.0.1:8000/Prescription
 
-**Sur Ubuntu/Debian:**
-
-```bash
-sudo apt update 
-sudo apt install python3 python3-pip python3-venv
-```
-
-Installation
-------------
-
-1) Créer un environnement virtuel et installer les dépendances
+## Installation classique (pip)
 
 ```bash
+# Créer un environnement virtuel
 python3 -m venv .venv
-````
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-```bash
-source .venv/bin/activate  #(Windows: .venv\\Scripts\\activate)
-```
+# Installer les dépendances
+pip install -e ".[dev]"
 
-```bash
-pip install -r requirements.txt
-```
-
-2) Initialiser la base de données
-
-```bash
-python manage.py makemigrations
-```
-
-```bash
+# Initialiser la base de données
 python manage.py migrate
 ```
 
@@ -64,30 +70,25 @@ python manage.py migrate
 python manage.py seed_demo --patients 2500 --medications 150 
 ```
 
-5) Lancer le serveur de développement
-
-```bash
+# Lancer le serveur
 python manage.py runserver
 ```
 
-Ouvrir http://127.0.0.1:8000/Patient et http://127.0.0.1:8000/Medication
+## Endpoints API
 
-Endpoints
----------
+### Patients
 
-- GET /Patient
-    - Filtres: nom | last_name, prenom | first_name, date_naissance | birth_date (YYYY-MM-DD)
-- GET /Medication
-    - Filtres: code, label, status (actif | suppr)
+| Méthode | Endpoint | Filtres |
+|---------|----------|---------|
+| GET | `/Patient` | `nom`, `prenom`, `date_naissance` (YYYY-MM-DD) |
 
-- À implémenter par le candidat: /Prescription (voir Énoncé ci‑dessous)
+### Médicaments
 
-Exemples (curl)
----------------
+| Méthode | Endpoint | Filtres |
+|---------|----------|---------|
+| GET | `/Medication` | `code`, `label`, `status` (actif\|suppr) |
 
-- curl -s "http://127.0.0.1:8000/Patient"
-- curl -s "http://127.0.0.1:8000/Patient?nom=Martin"
-- curl -s "http://127.0.0.1:8000/Medication?status=actif"
+### Prescriptions ✨
 
 Énoncé de l'exercice — Prescription
 -----------------------------------

@@ -1,33 +1,74 @@
-# Python
+# ============================================
+# ENTRETIENS-COHORT360 - Comprehensive .gitignore
+# Django + React + Scala/Spark + Playwright
+# ============================================
+
+# ==================== PYTHON / DJANGO ====================
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-wheel-metadata/
+
 # Virtual environments
 .venv/
 venv/
 env/
-.env
+ENV/
+env.bak/
+venv.bak/
 .python-version
 
-# Packaging / distribution
-build/
-dist/
-*.egg-info/
-.eggs/
-pip-wheel-metadata/
+# uv package manager
+.uv/
+uv.lock
 
-# Testing / tooling caches
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
 .tox/
 .nox/
 .coverage
 .coverage.*
+.cache
+nosetests.xml
 coverage.xml
-htmlcov/
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
 
 # Django
 *.log
@@ -37,11 +78,150 @@ db.sqlite3-journal
 /media/
 /staticfiles/
 
-# IDE / Editors
+# mypy / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Ruff
+.ruff_cache/
+
+# Cython debug symbols
+cython_debug/
+
+# ==================== NODE / REACT ====================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependencies
+node_modules/
+jspm_packages/
+web_modules/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Build outputs
+dist/
+.next/
+out/
+.nuxt/
+.output/
+.cache/
+.parcel-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+*.lcov
+.nyc_output/
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+.vite/
+
+# Optional caches
+.npm/
+.eslintcache
+.stylelintcache
+
+# dotenv environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# ==================== PLAYWRIGHT ====================
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# ==================== SCALA / SPARK ====================
+# sbt
+target/
+project/target/
+project/project/
+
+# Metals / bloop (Scala LSP)
+.metals/
+.bloop/
+metals.sbt
+.bsp/
+
+# Eclipse
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Spark temporary files
+spark-warehouse/
+derby.log
+metastore_db/
+
+# ==================== IDE / EDITORS ====================
 .idea/
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 *.code-workspace
+*.swp
+*.swo
+*~
 
-# OS files
+# ==================== OS FILES ====================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# ==================== DOCKER ====================
+docker-compose.override.yml
+
+# ==================== MISC ====================
+*.bak
+*.tmp
+*.temp
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
