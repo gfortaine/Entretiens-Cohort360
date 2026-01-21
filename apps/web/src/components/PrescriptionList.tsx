@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Prescription, PrescriptionStatus } from '../types';
 import { useDeletePrescription, useUpdatePrescription } from '../hooks/usePrescriptions';
 
@@ -7,25 +8,26 @@ interface PrescriptionListProps {
   isLoading: boolean;
 }
 
-const statusLabels: Record<PrescriptionStatus, string> = {
-  valide: 'Valide',
-  en_attente: 'En attente',
-  suppr: 'Supprimée',
-};
-
 const statusColors: Record<PrescriptionStatus, string> = {
   valide: '#22c55e',
   en_attente: '#f59e0b',
   suppr: '#ef4444',
 };
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('fr-FR');
-}
-
 export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListProps) {
+  const { t, i18n } = useTranslation();
   const deleteMutation = useDeletePrescription();
   const updateMutation = useUpdatePrescription();
+
+  const formatDate = (dateStr: string): string => {
+    return new Date(dateStr).toLocaleDateString(i18n.language === 'fr' ? 'fr-FR' : 'en-US');
+  };
+
+  const statusLabels: Record<PrescriptionStatus, string> = {
+    valide: t('status.valide'),
+    en_attente: t('status.en_attente'),
+    suppr: t('status.suppr'),
+  };
 
   const sortedPrescriptions = useMemo(() => {
     return [...prescriptions].sort((a, b) => 
@@ -34,11 +36,11 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
   }, [prescriptions]);
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette prescription ?')) {
+    if (window.confirm(t('table.confirmDelete'))) {
       try {
         await deleteMutation.mutateAsync(id);
       } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
+        console.error('Delete error:', error);
       }
     }
   };
@@ -47,15 +49,15 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
     try {
       await updateMutation.mutateAsync({ id, data: { status: newStatus } });
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      console.error('Update error:', error);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="loading" role="status" aria-label="Chargement">
+      <div className="loading" role="status" aria-label={t('common.loading')}>
         <div className="spinner"></div>
-        <p>Chargement des prescriptions...</p>
+        <p>{t('table.loading')}</p>
       </div>
     );
   }
@@ -63,7 +65,7 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
   if (prescriptions.length === 0) {
     return (
       <div className="empty-state">
-        <p>Aucune prescription trouvée.</p>
+        <p>{t('prescription.empty')}</p>
       </div>
     );
   }
@@ -73,13 +75,13 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
       <table>
         <thead>
           <tr>
-            <th>Patient</th>
-            <th>Médicament</th>
-            <th>Date début</th>
-            <th>Date fin</th>
-            <th>Statut</th>
-            <th>Commentaire</th>
-            <th>Actions</th>
+            <th>{t('table.patient')}</th>
+            <th>{t('table.medication')}</th>
+            <th>{t('table.startDate')}</th>
+            <th>{t('table.endDate')}</th>
+            <th>{t('table.status')}</th>
+            <th>{t('table.comment')}</th>
+            <th>{t('table.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +94,7 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
                 )}
                 {prescription.patient.birth_date && (
                   <small className="text-muted">
-                    Né(e) le {formatDate(prescription.patient.birth_date)}
+                    {t('table.bornOn', { date: formatDate(prescription.patient.birth_date) })}
                   </small>
                 )}
               </td>
@@ -132,7 +134,7 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
                   className="btn btn-danger btn-sm"
                   onClick={() => handleDelete(prescription.id)}
                   disabled={deleteMutation.isPending}
-                  aria-label={`Supprimer la prescription ${prescription.id}`}
+                  aria-label={t('table.deletePrescription', { id: prescription.id })}
                 >
                   🗑️
                 </button>
@@ -143,7 +145,7 @@ export function PrescriptionList({ prescriptions, isLoading }: PrescriptionListP
       </table>
       
       <div className="prescription-count">
-        {prescriptions.length} prescription{prescriptions.length > 1 ? 's' : ''} affichée{prescriptions.length > 1 ? 's' : ''}
+        {t('table.displayedCount', { count: prescriptions.length })}
       </div>
     </div>
   );

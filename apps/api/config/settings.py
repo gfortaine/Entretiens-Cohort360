@@ -124,6 +124,9 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
         "rest_framework.filters.SearchFilter",
     ],
+    # Pagination: 20 items per page (like OpenAI API best practice)
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
     # Django 5.2: Use modern exception handling
     "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
 }

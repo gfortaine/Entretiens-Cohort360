@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { prescriptionsApi, patientsApi, medicationsApi } from '../api/prescriptions';
-import type { PrescriptionFilters, PrescriptionCreateDTO, PrescriptionUpdateDTO } from '../types';
+import type { 
+  PrescriptionFilters, 
+  PrescriptionCreateDTO, 
+  PrescriptionUpdateDTO,
+  PaginationParams,
+  PaginatedResponse,
+  Prescription 
+} from '../types';
 
 // ========== Clés de cache ==========
 export const queryKeys = {
@@ -12,10 +19,10 @@ export const queryKeys = {
 
 // ========== Hooks pour les prescriptions ==========
 
-export function usePrescriptions(filters?: PrescriptionFilters) {
-  return useQuery({
-    queryKey: [...queryKeys.prescriptions, filters],
-    queryFn: () => prescriptionsApi.getAll(filters),
+export function usePrescriptions(filters?: PrescriptionFilters, pagination?: PaginationParams) {
+  return useQuery<PaginatedResponse<Prescription>>({
+    queryKey: [...queryKeys.prescriptions, filters, pagination],
+    queryFn: () => prescriptionsApi.getAll(filters, pagination),
     staleTime: 30000, // 30 secondes
   });
 }

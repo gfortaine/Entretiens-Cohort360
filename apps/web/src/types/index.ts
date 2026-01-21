@@ -54,3 +54,19 @@ export interface PrescriptionFilters {
   date_fin_from?: string;
   date_fin_to?: string;
 }
+
+// ========== Pagination (OpenAI-style, 20 per page) ==========
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export interface PaginationParams {
+  page?: number;
+  page_size?: number;
+}
+
+export const DEFAULT_PAGE_SIZE = 20;

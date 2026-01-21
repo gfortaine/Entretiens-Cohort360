@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import type { PrescriptionFilters as Filters, PrescriptionStatus } from '../types';
 import { usePatients, useMedications } from '../hooks/usePrescriptions';
 
@@ -7,20 +8,21 @@ interface PrescriptionFiltersProps {
   onFiltersChange: (filters: Filters) => void;
 }
 
-const statusOptions: { value: PrescriptionStatus | ''; label: string }[] = [
-  { value: '', label: 'Tous les statuts' },
-  { value: 'valide', label: 'Valide' },
-  { value: 'en_attente', label: 'En attente' },
-  { value: 'suppr', label: 'Supprimée' },
-];
-
 export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFiltersProps) {
+  const { t } = useTranslation();
   const { data: patients = [], isLoading: patientsLoading } = usePatients();
   const { data: medications = [], isLoading: medicationsLoading } = useMedications();
   
   const { register, handleSubmit, reset } = useForm<Filters>({
     defaultValues: filters,
   });
+
+  const statusOptions: { value: PrescriptionStatus | ''; label: string }[] = [
+    { value: '', label: t('status.all') },
+    { value: 'valide', label: t('status.valide') },
+    { value: 'en_attente', label: t('status.en_attente') },
+    { value: 'suppr', label: t('status.suppr') },
+  ];
 
   const onSubmit = (data: Filters) => {
     // Nettoyer les valeurs vides
@@ -40,18 +42,18 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
   return (
     <form className="filters-form" onSubmit={handleSubmit(onSubmit)}>
-      <h3>🔍 Filtres</h3>
+      <h3>🔍 {t('filters.title')}</h3>
       
       <div className="filters-grid">
         {/* Filtre Patient */}
         <div className="form-group">
-          <label htmlFor="patient">Patient</label>
+          <label htmlFor="patient">{t('filters.patient')}</label>
           <select 
             id="patient" 
             {...register('patient')}
             disabled={patientsLoading}
           >
-            <option value="">Tous les patients</option>
+            <option value="">{t('filters.allPatients')}</option>
             {patients.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.last_name} {p.first_name}
@@ -62,13 +64,13 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Médicament */}
         <div className="form-group">
-          <label htmlFor="medication">Médicament</label>
+          <label htmlFor="medication">{t('filters.medication')}</label>
           <select 
             id="medication" 
             {...register('medication')}
             disabled={medicationsLoading}
           >
-            <option value="">Tous les médicaments</option>
+            <option value="">{t('filters.allMedications')}</option>
             {medications.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.label} ({m.code})
@@ -79,7 +81,7 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Statut */}
         <div className="form-group">
-          <label htmlFor="status">Statut</label>
+          <label htmlFor="status">{t('filters.status')}</label>
           <select id="status" {...register('status')}>
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -91,7 +93,7 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Date de début - From */}
         <div className="form-group">
-          <label htmlFor="date_debut_from">Date début (après)</label>
+          <label htmlFor="date_debut_from">{t('filters.startDate')} (≥)</label>
           <input 
             type="date" 
             id="date_debut_from" 
@@ -101,7 +103,7 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Date de début - To */}
         <div className="form-group">
-          <label htmlFor="date_debut_to">Date début (avant)</label>
+          <label htmlFor="date_debut_to">{t('filters.startDate')} (≤)</label>
           <input 
             type="date" 
             id="date_debut_to" 
@@ -111,7 +113,7 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Date de fin - From */}
         <div className="form-group">
-          <label htmlFor="date_fin_from">Date fin (après)</label>
+          <label htmlFor="date_fin_from">{t('filters.endDate')} (≥)</label>
           <input 
             type="date" 
             id="date_fin_from" 
@@ -121,7 +123,7 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
         {/* Filtre Date de fin - To */}
         <div className="form-group">
-          <label htmlFor="date_fin_to">Date fin (avant)</label>
+          <label htmlFor="date_fin_to">{t('filters.endDate')} (≤)</label>
           <input 
             type="date" 
             id="date_fin_to" 
@@ -132,10 +134,10 @@ export function PrescriptionFilters({ filters, onFiltersChange }: PrescriptionFi
 
       <div className="filters-actions">
         <button type="submit" className="btn btn-primary">
-          Appliquer les filtres
+          {t('filters.apply')}
         </button>
         <button type="button" className="btn btn-secondary" onClick={handleReset}>
-          Réinitialiser
+          {t('filters.reset')}
         </button>
       </div>
     </form>
