@@ -1,11 +1,22 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PrescriptionList } from './components/PrescriptionList';
-import { PrescriptionFilters } from './components/PrescriptionFilters';
-import { PrescriptionForm } from './components/PrescriptionForm';
-import { usePrescriptions } from './hooks/usePrescriptions';
-import type { PrescriptionFilters as Filters } from './types';
-import './App.css';
+import { Filter, Plus, X, RefreshCw } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+import { PrescriptionTable } from '@/components/PrescriptionTable';
+import { PrescriptionFiltersForm } from '@/components/PrescriptionFiltersForm';
+import { PrescriptionFormDialog } from '@/components/PrescriptionFormDialog';
+import { AppPagination } from '@/components/AppPagination';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+import { usePrescriptions } from '@/hooks/usePrescriptions';
+import type { PrescriptionFilters as Filters } from '@/types';
+import { DEFAULT_PAGE_SIZE } from '@/types';
+import logoAphp from '@/assets/logo-aphp-white.png';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,68 +28,179 @@ const queryClient = new QueryClient({
 });
 
 function PrescriptionApp() {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<Filters>({});
   const [showForm, setShowForm] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   
-  const { data: prescriptions = [], isLoading, error, refetch } = usePrescriptions(filters);
+  const { data, isLoading, error, refetch } = usePrescriptions(filters, { page: currentPage });
+  
+  const prescriptions = data?.results ?? [];
+  const totalCount = data?.count ?? 0;
+  const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
+
+  const handleFiltersChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const activeFiltersCount = Object.values(filters).filter(v => v !== undefined && v !== '').length;
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>💊 Gestion des Prescriptions</h1>
-        <p className="subtitle">AP-HP - Cohort360</p>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Header AP-HP */}
+      <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0063AF] to-[#004d8a] shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img src={logoAphp} alt="AP-HP" className="h-10 w-auto" />
+              <div>
+                <h1 className="text-xl font-bold text-white font-heading">
+                  {t('header.title')}
+                </h1>
+                <p className="text-sm text-white/80">
+                  {t('header.subtitle')}
+                </p>
+              </div>
+            </div>
+            <LanguageSwitcher />
+          </div>
+        </div>
       </header>
 
-      <main className="app-main">
-        {/* Section Formulaire */}
-        <section className="section">
-          <button 
-            className="btn btn-primary toggle-btn"
-            onClick={() => setShowForm(!showForm)}
-          >
-            {showForm ? '📋 Masquer le formulaire' : '➕ Nouvelle prescription'}
-          </button>
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div className="space-y-6">
           
-          {showForm && (
-            <PrescriptionForm 
-              onSuccess={() => {
-                refetch();
-              }} 
-            />
-          )}
-        </section>
-
-        {/* Section Filtres */}
-        <section className="section">
-          <PrescriptionFilters 
-            filters={filters} 
-            onFiltersChange={setFilters} 
-          />
-        </section>
-
-        {/* Section Liste */}
-        <section className="section">
-          <h2>📋 Liste des Prescriptions</h2>
-          
-          {error && (
-            <div className="error-banner" role="alert">
-              Erreur lors du chargement des prescriptions. 
-              <button onClick={() => refetch()} className="btn btn-sm">
-                Réessayer
-              </button>
+          {/* Actions Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="bg-[#0063AF] hover:bg-[#004d8a]"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {t('prescription.new')}
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={() => setShowFilters(!showFilters)}
+                className="relative"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                {t('filters.title')}
+                {activeFiltersCount > 0 && (
+                  <Badge 
+                    variant="secondary" 
+                    className="ml-2 bg-[#ED6D91] text-white"
+                  >
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </Button>
             </div>
+            
+            <div className="text-sm text-muted-foreground">
+              {totalCount > 0 && t('prescription.count', { count: totalCount })}
+            </div>
+          </div>
+
+          {/* Filters Card */}
+          {showFilters && (
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    {t('filters.title')}
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowFilters(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <PrescriptionFiltersForm 
+                  filters={filters} 
+                  onFiltersChange={handleFiltersChange} 
+                />
+              </CardContent>
+            </Card>
           )}
-          
-          <PrescriptionList 
-            prescriptions={prescriptions} 
-            isLoading={isLoading} 
-          />
-        </section>
+
+          {/* Prescriptions Table Card */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>{t('prescription.title')}</CardTitle>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => refetch()}
+                  disabled={isLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {error ? (
+                <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
+                  <p>{t('errors.loadFailed')}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetch()}
+                    className="mt-2"
+                  >
+                    {t('common.reset')}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <PrescriptionTable 
+                    prescriptions={prescriptions} 
+                    isLoading={isLoading} 
+                  />
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-6">
+                      <AppPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
-      <footer className="app-footer">
-        <p>© 2025 AP-HP - Exercice technique Full-Stack</p>
+      {/* Footer */}
+      <footer className="border-t bg-card py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+          © 2025 AP-HP - Exercice technique Full-Stack
+        </div>
       </footer>
+
+      {/* Form Dialog */}
+      <PrescriptionFormDialog 
+        open={showForm} 
+        onOpenChange={setShowForm}
+        onSuccess={() => {
+          refetch();
+          setShowForm(false);
+        }}
+      />
     </div>
   );
 }
