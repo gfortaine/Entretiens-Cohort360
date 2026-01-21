@@ -102,7 +102,9 @@
   "pagination": {
     "previous": "Previous",
     "next": "Next",
-    "page": "Page {{current}} of {{total}}"
+    "page": "Page {{current}} of {{total}}",
+    "showing": "Showing {{from}} to {{to}} of {{total}} results",
+    "pageOf": "Page {{page}} of {{total}}"
   },
   "errors": {
     "loadFailed": "Failed to load data",

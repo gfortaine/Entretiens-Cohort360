@@ -102,7 +102,9 @@
   "pagination": {
     "previous": "Précédent",
     "next": "Suivant",
-    "page": "Page {{current}} sur {{total}}"
+    "page": "Page {{current}} sur {{total}}",
+    "showing": "Affichage de {{from}} à {{to}} sur {{total}} résultats",
+    "pageOf": "Page {{page}} sur {{total}}"
   },
   "errors": {
     "loadFailed": "Erreur lors du chargement des données",
