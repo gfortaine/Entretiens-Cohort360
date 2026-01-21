@@ -17,17 +17,15 @@
 
 ```
 cohort360-exercises/
-├── apps/                        # Applications
-│   ├── web/                     # 🌐 Frontend React (Patient Portal)
+├── apps/                        # Deployable Applications
+│   ├── web/                     # 🌐 React Frontend (Patient Portal)
 │   │   ├── src/
 │   │   │   ├── components/      # PrescriptionForm, List, Filters
 │   │   │   ├── hooks/           # React Query hooks
 │   │   │   ├── api/             # Client Axios
 │   │   │   └── test/            # 18 tests Vitest
 │   │   └── package.json
-│   └── docs/                    # 📚 Documentation (placeholder)
-│
-├── services/                    # Backend Services
+│   │
 │   ├── api/                     # 🐍 Django REST API
 │   │   ├── config/              # Django 5.2 LTS settings
 │   │   ├── medical/             # App: Patient, Medication, Prescription
@@ -35,20 +33,29 @@ cohort360-exercises/
 │   │   │   ├── serializers.py
 │   │   │   ├── views.py
 │   │   │   └── tests/           # 29 tests unitaires
-│   │   └── pyproject.toml       # uv + dev tools
+│   │   ├── pyproject.toml       # uv + dev tools
+│   │   └── package.json         # Turbo proxy for Python
 │   │
 │   └── spark/                   # ⚡ Scala/Spark Data Engine
 │       ├── src/main/scala/
 │       │   └── com/exercise/
 │       │       ├── Main.scala
 │       │       └── engine/      # CohortSearchEngine
-│       └── build.sbt
+│       ├── build.sbt
+│       └── package.json         # Turbo proxy for Scala
 │
 ├── packages/                    # Shared Packages
 │   ├── types/                   # 📦 @cohort360/types
 │   ├── ui/                      # 🎨 @cohort360/ui
 │   ├── eslint-config/           # 🔧 @cohort360/eslint-config
 │   └── typescript-config/       # 🔧 @cohort360/typescript-config
+│
+├── docs/                        # 📚 Documentation
+│   ├── exercises/               # Original exercise specifications
+│   │   ├── django/
+│   │   ├── react/
+│   │   └── scala/
+│   └── README.md
 │
 ├── e2e/                         # 🧪 Playwright E2E Tests
 │   ├── api/                     # API integration tests
@@ -90,15 +97,17 @@ cohort360-exercises/
 npm install
 
 # 2. Setup Django API
-cd services/api
+cd apps/api
 uv sync --all-extras
 uv run python manage.py migrate
 uv run python manage.py seed_demo
 cd ../..
 
 # 3. Run development servers
-npm run api:dev      # Django on http://127.0.0.1:8000
-npm run dev          # React on http://127.0.0.1:3000 (via Turbo)
+turbo dev --filter=@cohort360/api   # Django on http://127.0.0.1:8000
+turbo dev --filter=@cohort360/web   # React on http://127.0.0.1:3000
+# Or run all at once:
+turbo dev
 ```
 
 ---
@@ -115,16 +124,11 @@ npm run lint             # Lint all code
 npm run test             # Run all tests
 npm run typecheck        # TypeScript type checking
 
-# API (Django)
-npm run api:dev          # Start Django server
-npm run api:test         # Run Django tests
-npm run api:migrate      # Run migrations
-npm run api:seed         # Seed demo data
-
-# Spark
-npm run spark:build      # Compile Scala
-npm run spark:test       # Run Spark tests
-npm run spark:run        # Run Spark job
+# Targeted commands (Turbo filters)
+turbo dev --filter=@cohort360/api     # Django only
+turbo dev --filter=@cohort360/web     # React only
+turbo test --filter=@cohort360/api    # Django tests only
+turbo test --filter=@cohort360/web    # React tests only
 
 # E2E (Playwright)
 npm run test:e2e         # Run all E2E tests
@@ -141,10 +145,17 @@ npm run dev              # Vite dev server
 npm run build            # Production build
 npm test                 # Vitest tests
 
-# Django (services/api)
-cd services/api
-uv run pytest            # Unit tests
-uv run python manage.py shell  # Django shell
+# Django (apps/api)
+cd apps/api
+npm run dev              # Django server (via proxy package.json)
+npm run test             # Pytest tests
+npm run migrate          # Run migrations
+npm run seed             # Seed demo data
+
+# Spark (apps/spark)
+cd apps/spark
+npm run build            # sbt compile
+npm run dev              # sbt run
 ```
 
 ---
@@ -154,15 +165,18 @@ uv run python manage.py shell  # Django shell
 ### Run All Tests
 
 ```bash
+# All tests via Turborepo
+turbo test
+
 # Django (29 tests)
-npm run api:test
+turbo test --filter=@cohort360/api
 
 # React/Vitest (18 tests)
-cd apps/web && npm test
+turbo test --filter=@cohort360/web
 
 # E2E (24 tests) - requires servers running
-npm run api:dev &        # Start Django
-npm run test:e2e         # Run Playwright
+turbo dev --filter=@cohort360/api &
+npm run test:e2e
 ```
 
 ### Test Coverage
@@ -245,15 +259,32 @@ turbo run build             # Cached builds
 3. **Shared packages**: Common types and UI components
 4. **Consistent tooling**: Shared configs across apps
 
-### Why services/ instead of apps/?
+### Why all apps in `apps/`?
 
-- `apps/` = User-facing applications (web, mobile, docs)
-- `services/` = Backend services (api, spark, workers)
-- Clear separation of concerns and deployment targets
+Per [Turborepo best practices](https://turbo.build/repo/docs), **all deployable units belong in `apps/`**:
 
-### Scala/Spark Placement
+- `apps/web` = React frontend
+- `apps/api` = Django REST API
+- `apps/spark` = Scala/Spark data engine
 
-The Spark service is in `services/spark/` but managed by sbt, not npm workspaces. Turborepo orchestrates it via shell scripts.
+This differs from some patterns that use `services/` for backends, but the official Turborepo convention is to use `apps/` for anything that's deployed, and `packages/` for shared libraries.
+
+### Python/Scala in Turborepo
+
+Non-JavaScript apps (Django, Spark) have **proxy `package.json` files** that expose their scripts to Turborepo:
+
+```json
+// apps/api/package.json
+{
+  "name": "@cohort360/api",
+  "scripts": {
+    "dev": "uv run python manage.py runserver",
+    "test": "uv run pytest"
+  }
+}
+```
+
+This allows `turbo dev` to start all servers in parallel!
 
 ---
 

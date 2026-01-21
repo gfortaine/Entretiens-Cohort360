@@ -24,7 +24,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -62,14 +62,14 @@ export default defineConfig({
   // Uncomment these for CI - servers should be started manually in development
   // webServer: [
   //   {
-  //     command: 'cd Exercice_Django && uv run python manage.py runserver 8000',
+  //     command: 'cd apps/api && uv run python manage.py runserver 8000',
   //     url: 'http://127.0.0.1:8000/Patient',
   //     reuseExistingServer: !process.env.CI,
   //     timeout: 120 * 1000,
   //   },
   //   {
-  //     command: 'cd Exercice_Front/prescription-app && npm run dev',
-  //     url: 'http://127.0.0.1:3000',
+  //     command: 'cd apps/web && npm run dev',
+  //     url: 'http://127.0.0.1:5173',
   //     reuseExistingServer: !process.env.CI,
   //     timeout: 120 * 1000,
   //   },

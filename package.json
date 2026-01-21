@@ -20,14 +20,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "test:api": "playwright test e2e/api/",
-    "screenshot": "mkdir -p screenshots && playwright test e2e/prescriptions/ --update-snapshots",
-    "api:dev": "cd services/api && uv run python manage.py runserver",
-    "api:test": "cd services/api && uv run pytest medical/tests/ -v",
-    "api:migrate": "cd services/api && uv run python manage.py migrate",
-    "api:seed": "cd services/api && uv run python manage.py seed_demo",
-    "spark:build": "cd services/spark && sbt compile",
-    "spark:test": "cd services/spark && sbt test",
-    "spark:run": "cd services/spark && sbt run"
+    "screenshot": "mkdir -p screenshots && playwright test e2e/prescriptions/ --update-snapshots"
   },
   "repository": {
     "type": "git",

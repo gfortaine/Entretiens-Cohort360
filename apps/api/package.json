@@ -1,0 +1,16 @@
+{
+  "name": "@cohort360/api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Django REST API for Cohort360 Prescription Management",
+  "scripts": {
+    "dev": "uv run python manage.py runserver 0.0.0.0:8000",
+    "test": "uv run pytest medical/tests/ -v",
+    "lint": "uv run ruff check .",
+    "typecheck": "uv run mypy .",
+    "migrate": "uv run python manage.py migrate",
+    "seed": "uv run python manage.py seed_demo",
+    "shell": "uv run python manage.py shell"
+  },
+  "keywords": ["django", "rest-api", "healthcare", "prescriptions"]
+}

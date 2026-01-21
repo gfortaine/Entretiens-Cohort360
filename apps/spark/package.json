@@ -1,0 +1,13 @@
+{
+  "name": "@cohort360/spark",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scala/Spark Data Engine for Cohort Search",
+  "scripts": {
+    "build": "sbt compile",
+    "test": "sbt test",
+    "dev": "sbt run",
+    "clean": "sbt clean"
+  },
+  "keywords": ["scala", "spark", "cohort", "data-processing"]
+}
