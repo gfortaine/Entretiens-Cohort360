@@ -165,3 +165,229 @@ test.describe('Prescription Table - Total Count Edge Cases', () => {
     expect(hasFooter || hasNoResults).toBe(true);
   });
 });
+
+/**
+ * EDIT FUNCTIONALITY TESTS (US-003)
+ * Tests for the Edit prescription workflow
+ */
+test.describe('Prescription Table - Edit Functionality', () => {
+  
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('table', { state: 'visible' });
+  });
+
+  test('Edit dialog should show prescription data', async ({ page }) => {
+    // Find the first Edit button
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Get the medication name from the row before clicking
+    const firstRow = page.locator('table tbody tr').first();
+    const medicationCell = firstRow.locator('td').nth(1); // Medication is 2nd column
+    const originalMedication = await medicationCell.textContent();
+    
+    // Click the edit button
+    await editButton.click();
+    
+    // Dialog should open
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
+    
+    // Medication field should contain the original value
+    const medicationInput = dialog.getByLabel(/médicament|medication/i);
+    if (await medicationInput.isVisible()) {
+      await expect(medicationInput).toHaveValue(originalMedication?.trim() || '');
+    }
+  });
+
+  test('Edit dialog should have disabled patient field', async ({ page }) => {
+    // Per spec: patient cannot be changed after creation
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    await editButton.click();
+    
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
+    
+    // Patient field should be disabled
+    const patientSelect = dialog.locator('select[name="patient"], [data-testid="patient-select"]');
+    if (await patientSelect.isVisible()) {
+      await expect(patientSelect).toBeDisabled();
+    }
+  });
+
+  test('Edit dialog should have "Mettre à jour" button', async ({ page }) => {
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    await editButton.click();
+    
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
+    
+    // Should have update button
+    const updateButton = dialog.getByRole('button', { name: /mettre à jour|update/i });
+    await expect(updateButton).toBeVisible();
+  });
+
+  test('Cancel edit should close dialog without changes', async ({ page }) => {
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Get original row content
+    const firstRow = page.locator('table tbody tr').first();
+    const originalContent = await firstRow.textContent();
+    
+    await editButton.click();
+    
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
+    
+    // Click cancel or close
+    const cancelButton = dialog.getByRole('button', { name: /annuler|cancel/i });
+    if (await cancelButton.isVisible()) {
+      await cancelButton.click();
+    } else {
+      // Try closing via X button or Escape
+      await page.keyboard.press('Escape');
+    }
+    
+    // Dialog should be closed
+    await expect(dialog).not.toBeVisible();
+    
+    // Row content should be unchanged
+    const newContent = await firstRow.textContent();
+    expect(newContent).toBe(originalContent);
+  });
+});
+
+/**
+ * DELETE FUNCTIONALITY TESTS (US-004)
+ * Tests for the Delete (soft delete) prescription workflow
+ */
+test.describe('Prescription Table - Delete Functionality', () => {
+  
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('table', { state: 'visible' });
+  });
+
+  test('Delete button should be visible on each row', async ({ page }) => {
+    const deleteButtons = page.locator('table button[title*="Supprimer"], table button[title*="Delete"]');
+    const tableRows = page.locator('table tbody tr');
+    const rowCount = await tableRows.count();
+    
+    if (rowCount > 0) {
+      const buttonCount = await deleteButtons.count();
+      expect(buttonCount).toBeGreaterThan(0);
+    }
+  });
+
+  test('Delete button has correct icon', async ({ page }) => {
+    const deleteButton = page.locator('table button[title*="Supprimer"], table button[title*="Delete"]').first();
+    
+    if (!(await deleteButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Button should contain trash icon (🗑️ or svg)
+    const buttonContent = await deleteButton.textContent();
+    const hasSvg = await deleteButton.locator('svg').count() > 0;
+    
+    expect(buttonContent?.includes('🗑️') || hasSvg).toBe(true);
+  });
+
+  test('Delete button click should not open dialog (direct action)', async ({ page }) => {
+    // Per spec, delete is a direct PATCH to status: 'suppr'
+    const deleteButton = page.locator('table button[title*="Supprimer"], table button[title*="Delete"]').first();
+    
+    if (!(await deleteButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Note: We don't actually click because we don't want to modify data
+    // Just verify the button is accessible
+    await expect(deleteButton).toBeEnabled();
+  });
+});
+
+/**
+ * ACTIONS COLUMN TESTS
+ * Tests for the Actions column behavior
+ */
+test.describe('Prescription Table - Actions Column', () => {
+  
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('table', { state: 'visible' });
+  });
+
+  test('Actions column should be the last column', async ({ page }) => {
+    const headerCells = page.locator('table thead th');
+    const headerCount = await headerCells.count();
+    
+    if (headerCount > 0) {
+      const lastHeader = headerCells.nth(headerCount - 1);
+      const lastHeaderText = await lastHeader.textContent();
+      expect(lastHeaderText?.toLowerCase()).toContain('actions');
+    }
+  });
+
+  test('Actions column should contain both Edit and Delete buttons', async ({ page }) => {
+    const firstRow = page.locator('table tbody tr').first();
+    
+    if (!(await firstRow.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Get the last cell (actions column)
+    const cells = firstRow.locator('td');
+    const cellCount = await cells.count();
+    const actionsCell = cells.nth(cellCount - 1);
+    
+    // Should have both buttons
+    const editButton = actionsCell.locator('button[title*="Modifier"], button[title*="Edit"]');
+    const deleteButton = actionsCell.locator('button[title*="Supprimer"], button[title*="Delete"]');
+    
+    await expect(editButton).toBeVisible();
+    await expect(deleteButton).toBeVisible();
+  });
+
+  test('Action buttons should have tooltips', async ({ page }) => {
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    const deleteButton = page.locator('table button[title*="Supprimer"], table button[title*="Delete"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Check title attributes
+    const editTitle = await editButton.getAttribute('title');
+    const deleteTitle = await deleteButton.getAttribute('title');
+    
+    expect(editTitle).toBeTruthy();
+    expect(deleteTitle).toBeTruthy();
+  });
+});

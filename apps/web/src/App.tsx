@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { PrescriptionTable } from '@/components/PrescriptionTable';
 import { PrescriptionFiltersForm } from '@/components/PrescriptionFiltersForm';
 import { PrescriptionFormDialog } from '@/components/PrescriptionFormDialog';
-import { AppPagination } from '@/components/AppPagination';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 import { usePrescriptions, useUpdatePrescription } from '@/hooks/usePrescriptions';
