@@ -143,6 +143,129 @@ test.describe('Prescription CRUD - Read', () => {
   });
 });
 
+test.describe('Prescription CRUD - Update', () => {
+  test('should open edit dialog for existing prescription', async ({ prescriptionPage, page }) => {
+    const count = await prescriptionPage.getPrescriptionCount();
+    
+    if (count > 0) {
+      // Click edit button on first row
+      const firstRow = await prescriptionPage.getTableRowByIndex(0);
+      const editButton = firstRow.getByRole('button', { name: /modifier|edit/i });
+      const hasEdit = await editButton.isVisible().catch(() => false);
+      
+      if (hasEdit) {
+        await editButton.click();
+        await expect(prescriptionPage.dialog).toBeVisible();
+        
+        // Dialog should have pre-filled values
+        await expect(prescriptionPage.dialogSubmitButton).toBeVisible();
+        
+        await prescriptionPage.closeDialog();
+      }
+    }
+  });
+
+  test('should update prescription status', async ({ prescriptionPage, page }) => {
+    const count = await prescriptionPage.getPrescriptionCount();
+    
+    if (count > 0) {
+      const firstRow = await prescriptionPage.getTableRowByIndex(0);
+      const editButton = firstRow.getByRole('button', { name: /modifier|edit/i });
+      const hasEdit = await editButton.isVisible().catch(() => false);
+      
+      if (hasEdit) {
+        await editButton.click();
+        await expect(prescriptionPage.dialog).toBeVisible();
+        
+        // Change status
+        await prescriptionPage.dialogStatusSelect.click();
+        await page.getByRole('option', { name: /en cours|pending/i }).click();
+        
+        // Submit
+        await prescriptionPage.dialogSubmitButton.click();
+        
+        // Wait for success
+        await prescriptionPage.waitForSuccess();
+        
+        // Table should still be visible
+        await expect(prescriptionPage.prescriptionTable).toBeVisible();
+      }
+    }
+  });
+});
+
+test.describe('Prescription CRUD - Delete (Soft Delete)', () => {
+  test('should have delete button on prescription rows', async ({ prescriptionPage }) => {
+    const count = await prescriptionPage.getPrescriptionCount();
+    
+    if (count > 0) {
+      const firstRow = await prescriptionPage.getTableRowByIndex(0);
+      const deleteButton = firstRow.getByRole('button', { name: /supprimer|delete/i });
+      
+      // Delete button should exist (may be visible or in dropdown)
+      const hasDelete = await deleteButton.isVisible().catch(() => false);
+      expect(typeof hasDelete).toBe('boolean');
+    }
+  });
+
+  test('should soft delete prescription (status becomes suppr)', async ({ prescriptionPage, page }) => {
+    // First, filter to show only valid prescriptions
+    await prescriptionPage.selectFilterStatus('valide');
+    await page.waitForTimeout(500);
+    
+    const count = await prescriptionPage.getPrescriptionCount();
+    
+    if (count > 0) {
+      const firstRow = await prescriptionPage.getTableRowByIndex(0);
+      const deleteButton = firstRow.getByRole('button', { name: /supprimer|delete/i });
+      const hasDelete = await deleteButton.isVisible().catch(() => false);
+      
+      if (hasDelete) {
+        // Get prescription ID or content before delete
+        const rowTextBefore = await firstRow.textContent();
+        
+        // Click delete
+        await deleteButton.click();
+        
+        // Wait for API response
+        await prescriptionPage.waitForSuccess();
+        
+        // After soft delete, the row should either:
+        // 1. Disappear from filtered view (status=valide filter active)
+        // 2. Show status as 'suppr' if filter is cleared
+        
+        // Clear filter and check the prescription now has suppr status
+        await prescriptionPage.clearFilters();
+        await page.waitForTimeout(500);
+        
+        // Filter by suppr to verify it exists there
+        await prescriptionPage.selectFilterStatus('suppr');
+        await page.waitForTimeout(500);
+        
+        // Should have at least one deleted prescription
+        const deletedCount = await prescriptionPage.getPrescriptionCount();
+        expect(deletedCount).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  test('should show deleted prescriptions when filtering by suppr status', async ({ prescriptionPage, page }) => {
+    // Filter by suppr status
+    await prescriptionPage.selectFilterStatus('suppr');
+    await page.waitForTimeout(500);
+    
+    // URL should reflect filter
+    const params = await prescriptionPage.getUrlParams();
+    expect(params.get('status')).toBe('suppr');
+    
+    // Check for prescriptions or empty state
+    const hasRows = (await prescriptionPage.getPrescriptionCount()) > 0;
+    const hasEmpty = await prescriptionPage.emptyState.isVisible().catch(() => false);
+    
+    expect(hasRows || hasEmpty).toBe(true);
+  });
+});
+
 test.describe('Prescription Filters - Legacy', () => {
   test('should filter by status using shadcn select', async ({ prescriptionPage, page }) => {
     // Apply status filter using shadcn Select

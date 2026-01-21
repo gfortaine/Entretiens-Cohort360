@@ -17,10 +17,14 @@ test.describe('Pagination - Visibility', () => {
     // Check if pagination is visible (depends on data)
     const count = await prescriptionPage.getPrescriptionCount();
     
-    // If we have results, pagination might be visible
-    if (count > 0) {
-      // Pagination may or may not be visible depending on total count
-      const isPaginationVisible = await prescriptionPage.pagination.isVisible().catch(() => false);
+    // If we have enough results, pagination should be visible
+    // Default PAGE_SIZE is 10, so pagination appears when count > 10
+    const isPaginationVisible = await prescriptionPage.pagination.isVisible().catch(() => false);
+    
+    if (count > 10) {
+      expect(isPaginationVisible).toBe(true);
+    } else {
+      // With fewer results, pagination may or may not show
       expect(typeof isPaginationVisible).toBe('boolean');
     }
   });
