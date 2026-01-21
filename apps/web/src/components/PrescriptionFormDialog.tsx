@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Save } from 'lucide-react';
@@ -22,12 +22,13 @@ import {
 } from '@/components/ui/select';
 import { usePatients, useMedications } from '@/hooks/usePrescriptions';
 import { prescriptionsApi } from '@/api/prescriptions';
-import type { PrescriptionCreateDTO, PrescriptionStatus } from '@/types';
+import type { Prescription, PrescriptionCreateDTO, PrescriptionStatus } from '@/types';
 
 interface PrescriptionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  prescription?: Prescription; // If provided, dialog is in edit mode
 }
 
 interface FormData {
@@ -54,15 +55,34 @@ export function PrescriptionFormDialog({
   open,
   onOpenChange,
   onSuccess,
+  prescription,
 }: PrescriptionFormDialogProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  
+  const isEditMode = !!prescription;
 
   const { data: patients = [] } = usePatients();
   const { data: medications = [] } = useMedications();
 
-  const mutation = useMutation({
+  // Populate form when editing
+  useEffect(() => {
+    if (prescription && open) {
+      setFormData({
+        patient: prescription.patient.id.toString(),
+        medication: prescription.medication.id.toString(),
+        start_date: prescription.start_date,
+        end_date: prescription.end_date || '',
+        status: prescription.status,
+        comment: prescription.comment || '',
+      });
+    } else if (!open) {
+      setFormData(initialFormData);
+    }
+  }, [prescription, open]);
+
+  const createMutation = useMutation({
     mutationFn: (data: PrescriptionCreateDTO) => prescriptionsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
@@ -71,16 +91,34 @@ export function PrescriptionFormDialog({
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: (data: { id: number; payload: Partial<PrescriptionCreateDTO> }) => 
+      prescriptionsApi.update(data.id, data.payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
+      setFormData(initialFormData);
+      onSuccess();
+    },
+  });
+
+  const mutation = isEditMode ? updateMutation : createMutation;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate({
+    const payload = {
       patient: Number(formData.patient),
       medication: Number(formData.medication),
       start_date: formData.start_date,
       end_date: formData.end_date,
       status: formData.status,
       comment: formData.comment || null,
-    });
+    };
+    
+    if (isEditMode && prescription) {
+      updateMutation.mutate({ id: prescription.id, payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
@@ -97,20 +135,21 @@ export function PrescriptionFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t('form.title')}</DialogTitle>
-          <DialogDescription>{t('form.description')}</DialogDescription>
+          <DialogTitle>{isEditMode ? t('form.editTitle') : t('form.title')}</DialogTitle>
+          <DialogDescription>{isEditMode ? t('form.editDescription') : t('form.description')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {/* Patient */}
+            {/* Patient - Read-only in edit mode as per spec */}
             <div className="space-y-2">
               <Label htmlFor="form-patient">{t('form.patient')} *</Label>
               <Select
                 value={formData.patient}
                 onValueChange={(value) => updateField('patient', value)}
+                disabled={isEditMode}
               >
-                <SelectTrigger id="form-patient">
+                <SelectTrigger id="form-patient" className={isEditMode ? 'opacity-60' : ''}>
                   <SelectValue placeholder={t('form.selectPatient')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -212,7 +251,7 @@ export function PrescriptionFormDialog({
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-              {t('form.submit')}
+              {isEditMode ? t('form.update') : t('form.submit')}
             </Button>
           </DialogFooter>
         </form>

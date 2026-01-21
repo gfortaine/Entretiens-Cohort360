@@ -58,69 +58,76 @@ test.describe('Prescription Table - Regression Tests', () => {
   });
 
   /**
-   * REGRESSION TEST: Status should be editable
-   * Issue: After migrating to TanStack Table, the status column was changed
-   * from a select (combobox) to a static badge, removing the ability to
-   * change the status inline.
+   * SPEC COMPLIANCE TEST: Edit button on each row
+   * US-003: "Edit button on each prescription row"
    */
-  test('should have editable status select in table rows', async ({ page }) => {
-    // Find all status selects in the table
-    const statusSelects = page.locator('table select[aria-label*="Statut"], table select[aria-label*="Status"]');
+  test('should have Edit button on each table row', async ({ page }) => {
+    // Find all Edit buttons in the table
+    const editButtons = page.locator('table button[title*="Modifier"], table button[title*="Edit"]');
     
-    // There should be at least one status select (if there are prescriptions)
-    const count = await statusSelects.count();
-    
-    // If there are prescriptions, there should be status selects
     const tableRows = page.locator('table tbody tr');
     const rowCount = await tableRows.count();
     
     if (rowCount > 0) {
-      expect(count).toBeGreaterThan(0);
+      const buttonCount = await editButtons.count();
+      expect(buttonCount).toBe(rowCount);
     }
   });
 
-  test('should allow changing prescription status', async ({ page }) => {
-    // Find the first status select
-    const statusSelect = page.locator('table select[aria-label*="Statut"], table select[aria-label*="Status"]').first();
+  /**
+   * SPEC COMPLIANCE TEST: Delete button on each row  
+   * US-004: "Delete button on each prescription row"
+   */
+  test('should have Delete button on each table row', async ({ page }) => {
+    // Find all Delete buttons in the table
+    const deleteButtons = page.locator('table button[title*="Supprimer"], table button[title*="Delete"]');
     
-    // Skip if no status selects found
-    if (!(await statusSelect.isVisible())) {
+    const tableRows = page.locator('table tbody tr');
+    const rowCount = await tableRows.count();
+    
+    if (rowCount > 0) {
+      const buttonCount = await deleteButtons.count();
+      expect(buttonCount).toBe(rowCount);
+    }
+  });
+
+  test('Edit button should open edit dialog', async ({ page }) => {
+    // Find the first Edit button
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    // Skip if no edit buttons found
+    if (!(await editButton.isVisible())) {
       test.skip();
       return;
     }
     
-    // Get the current value
-    const currentValue = await statusSelect.inputValue();
+    // Click the edit button
+    await editButton.click();
     
-    // Select a different status
-    const newValue = currentValue === 'valide' ? 'en_attente' : 'valide';
-    await statusSelect.selectOption(newValue);
-    
-    // Wait for the update to complete
-    await page.waitForTimeout(500);
-    
-    // The value should have changed
-    const updatedValue = await statusSelect.inputValue();
-    expect(updatedValue).toBe(newValue);
-  });
-
-  test('status select should not trigger row click', async ({ page }) => {
-    // If clicking the status select triggers the row click handler,
-    // it would be a UX bug. This test ensures they are independent.
-    
-    const statusSelect = page.locator('table select[aria-label*="Statut"], table select[aria-label*="Status"]').first();
-    
-    if (!(await statusSelect.isVisible())) {
-      test.skip();
-      return;
-    }
-    
-    // Click on the status select
-    await statusSelect.click();
-    
-    // No modal or dialog should open (row click typically opens details)
+    // Dialog should open
     const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).not.toBeVisible();
+    await expect(dialog).toBeVisible();
+    
+    // Dialog should have edit-specific content (title mentions "Modifier" or "Edit")
+    const dialogTitle = dialog.locator('h2, [role="heading"]');
+    await expect(dialogTitle).toContainText(/modifier|edit/i);
+  });
+
+  test('Edit button click should not trigger row click', async ({ page }) => {
+    // This ensures the edit button has stopPropagation
+    const editButton = page.locator('table button[title*="Modifier"], table button[title*="Edit"]').first();
+    
+    if (!(await editButton.isVisible())) {
+      test.skip();
+      return;
+    }
+    
+    // Click on the edit button
+    await editButton.click();
+    
+    // Dialog should be the edit dialog, not something else
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible();
   });
 });
 

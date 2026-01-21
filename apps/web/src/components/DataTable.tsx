@@ -206,12 +206,6 @@ const statusColors: Record<string, string> = {
   suppr: 'bg-red-500 hover:bg-red-600',
 };
 
-const statusSelectColors: Record<string, string> = {
-  valide: '#22c55e',
-  en_attente: '#f59e0b',
-  suppr: '#ef4444',
-};
-
 export function StatusBadge({
   status,
 }: {
@@ -223,45 +217,5 @@ export function StatusBadge({
     <Badge className={`${statusColors[status] || 'bg-gray-500'} text-white`}>
       {t(`status.${status}`)}
     </Badge>
-  );
-}
-
-/**
- * StatusSelect - Editable status selector for prescriptions
- */
-export function StatusSelect({
-  status,
-  onStatusChange,
-  disabled = false,
-}: {
-  status: 'valide' | 'en_attente' | 'suppr';
-  onStatusChange: (newStatus: 'valide' | 'en_attente' | 'suppr') => void;
-  disabled?: boolean;
-}) {
-  const { t } = useTranslation();
-  
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.stopPropagation(); // Prevent row click
-    onStatusChange(e.target.value as 'valide' | 'en_attente' | 'suppr');
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click when clicking select
-  };
-  
-  return (
-    <select
-      value={status}
-      onChange={handleChange}
-      onClick={handleClick}
-      disabled={disabled}
-      className="rounded px-2 py-1 text-white text-sm font-medium cursor-pointer border-none focus:outline-none focus:ring-2 focus:ring-offset-1"
-      style={{ backgroundColor: statusSelectColors[status] }}
-      aria-label={t('table.status')}
-    >
-      <option value="valide">{t('status.valide')}</option>
-      <option value="en_attente">{t('status.en_attente')}</option>
-      <option value="suppr">{t('status.suppr')}</option>
-    </select>
   );
 }

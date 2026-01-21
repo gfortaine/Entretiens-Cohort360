@@ -15,7 +15,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 import { usePrescriptions, useUpdatePrescription } from '@/hooks/usePrescriptions';
 import { usePrescriptionFiltersUrl } from '@/hooks/usePrescriptionFiltersUrl';
-import { DEFAULT_PAGE_SIZE, type PrescriptionStatus } from '@/types';
+import { DEFAULT_PAGE_SIZE, type Prescription } from '@/types';
 import logoAphp from '@/assets/logo-aphp-white.png';
 
 const queryClient = new QueryClient({
@@ -31,20 +31,34 @@ function PrescriptionApp() {
   const { t } = useTranslation();
   const { filters, setFilters, page, setPage } = usePrescriptionFiltersUrl();
   const [showForm, setShowForm] = useState(false);
+  const [editingPrescription, setEditingPrescription] = useState<Prescription | undefined>();
   const [showFilters, setShowFilters] = useState(true);
   
   const { data, isLoading, error, refetch } = usePrescriptions(filters, { page });
-  const updateMutation = useUpdatePrescription();
+  const deleteMutation = useUpdatePrescription();
   
   const prescriptions = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
 
-  const handleStatusChange = async (prescriptionId: number, newStatus: PrescriptionStatus) => {
+  const handleEdit = (prescription: Prescription) => {
+    setEditingPrescription(prescription);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (prescription: Prescription) => {
+    // Soft delete: PATCH with status = 'suppr'
     try {
-      await updateMutation.mutateAsync({ id: prescriptionId, data: { status: newStatus } });
+      await deleteMutation.mutateAsync({ id: prescription.id, data: { status: 'suppr' } });
     } catch (error) {
-      console.error('Status update failed:', error);
+      console.error('Delete failed:', error);
+    }
+  };
+
+  const handleFormClose = (open: boolean) => {
+    setShowForm(open);
+    if (!open) {
+      setEditingPrescription(undefined);
     }
   };
 
@@ -184,8 +198,9 @@ function PrescriptionApp() {
                       total: totalCount,
                       onPageChange: handlePageChange,
                     }}
-                    onStatusChange={handleStatusChange}
-                    isUpdating={updateMutation.isPending}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    isDeleting={deleteMutation.isPending}
                   />
                 </>
               )}
@@ -201,13 +216,15 @@ function PrescriptionApp() {
         </div>
       </footer>
 
-      {/* Form Dialog */}
+      {/* Form Dialog - Create or Edit */}
       <PrescriptionFormDialog 
         open={showForm} 
-        onOpenChange={setShowForm}
+        onOpenChange={handleFormClose}
+        prescription={editingPrescription}
         onSuccess={() => {
           refetch();
           setShowForm(false);
+          setEditingPrescription(undefined);
         }}
       />
     </div>

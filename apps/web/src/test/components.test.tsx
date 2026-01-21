@@ -184,9 +184,9 @@ describe('Intégration', () => {
       { wrapper: createWrapper() }
     );
     
-    // Vérifie que les sélecteurs de statut sont présents
-    const statusSelects = screen.getAllByRole('combobox');
-    expect(statusSelects.length).toBeGreaterThan(0);
+    // Vérifie que les statuts sont présents (peuvent être multiples dans les selects)
+    expect(screen.getAllByText('Valide').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('En attente').length).toBeGreaterThan(0);
   });
 });
 
@@ -211,57 +211,77 @@ describe('PrescriptionTable', () => {
     expect(screen.getByText(/Affichage de 1 à 2 sur 2/)).toBeInTheDocument();
   });
 
-  it('affiche le sélecteur de statut éditable', () => {
-    const onStatusChange = vi.fn();
+  it('affiche les boutons Modifier et Supprimer pour chaque ligne', () => {
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
     
     render(
       <PrescriptionTable 
         prescriptions={mockPrescriptions} 
         isLoading={false}
-        onStatusChange={onStatusChange}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />,
       { wrapper: createWrapper() }
     );
     
-    // REGRESSION TEST: Status should be editable (combobox/select)
-    const statusSelects = screen.getAllByRole('combobox');
-    expect(statusSelects.length).toBe(mockPrescriptions.length);
+    // Each row should have Edit and Delete buttons
+    const editButtons = screen.getAllByTitle('Modifier');
+    const deleteButtons = screen.getAllByTitle('Supprimer');
+    expect(editButtons.length).toBe(mockPrescriptions.length);
+    expect(deleteButtons.length).toBe(mockPrescriptions.length);
   });
 
-  it('appelle onStatusChange quand le statut est modifié', () => {
-    const onStatusChange = vi.fn();
+  it('appelle onEdit quand le bouton Modifier est cliqué', () => {
+    const onEdit = vi.fn();
     
     render(
       <PrescriptionTable 
         prescriptions={mockPrescriptions} 
         isLoading={false}
-        onStatusChange={onStatusChange}
+        onEdit={onEdit}
       />,
       { wrapper: createWrapper() }
     );
     
-    // Find the first status select and change it
-    const statusSelects = screen.getAllByRole('combobox');
-    fireEvent.change(statusSelects[0], { target: { value: 'suppr' } });
+    const editButtons = screen.getAllByTitle('Modifier');
+    fireEvent.click(editButtons[0]);
     
-    // REGRESSION TEST: onStatusChange should be called with correct args
-    expect(onStatusChange).toHaveBeenCalledWith(mockPrescriptions[0].id, 'suppr');
+    expect(onEdit).toHaveBeenCalledWith(mockPrescriptions[0]);
   });
 
-  it('désactive les sélecteurs de statut pendant la mise à jour', () => {
+  it('appelle onDelete quand le bouton Supprimer est cliqué', () => {
+    const onDelete = vi.fn();
+    
     render(
       <PrescriptionTable 
         prescriptions={mockPrescriptions} 
         isLoading={false}
-        onStatusChange={vi.fn()}
-        isUpdating={true}
+        onDelete={onDelete}
       />,
       { wrapper: createWrapper() }
     );
     
-    const statusSelects = screen.getAllByRole('combobox');
-    statusSelects.forEach(select => {
-      expect(select).toBeDisabled();
+    const deleteButtons = screen.getAllByTitle('Supprimer');
+    fireEvent.click(deleteButtons[0]);
+    
+    expect(onDelete).toHaveBeenCalledWith(mockPrescriptions[0]);
+  });
+
+  it('désactive les boutons Supprimer pendant la suppression', () => {
+    render(
+      <PrescriptionTable 
+        prescriptions={mockPrescriptions} 
+        isLoading={false}
+        onDelete={vi.fn()}
+        isDeleting={true}
+      />,
+      { wrapper: createWrapper() }
+    );
+    
+    const deleteButtons = screen.getAllByTitle('Supprimer');
+    deleteButtons.forEach(button => {
+      expect(button).toBeDisabled();
     });
   });
 

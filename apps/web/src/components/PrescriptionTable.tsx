@@ -7,10 +7,11 @@
 
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, User, Pill } from 'lucide-react';
+import { Calendar, User, Pill, Pencil, Trash2 } from 'lucide-react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { DataTable, StatusSelect } from '@/components/DataTable';
-import type { Prescription, PrescriptionStatus } from '@/types';
+import { DataTable, StatusBadge } from '@/components/DataTable';
+import { Button } from '@/components/ui/button';
+import type { Prescription } from '@/types';
 
 interface PrescriptionTableProps {
   prescriptions: Prescription[];
@@ -22,8 +23,9 @@ interface PrescriptionTableProps {
     onPageChange: (page: number) => void;
   };
   onRowClick?: (prescription: Prescription) => void;
-  onStatusChange?: (prescriptionId: number, newStatus: PrescriptionStatus) => void;
-  isUpdating?: boolean;
+  onEdit?: (prescription: Prescription) => void;
+  onDelete?: (prescription: Prescription) => void;
+  isDeleting?: boolean;
 }
 
 function formatDate(dateStr: string): string {
@@ -39,8 +41,9 @@ export function PrescriptionTable({
   isLoading,
   pagination,
   onRowClick,
-  onStatusChange,
-  isUpdating = false,
+  onEdit,
+  onDelete,
+  isDeleting = false,
 }: PrescriptionTableProps) {
   const { t } = useTranslation();
 
@@ -117,13 +120,7 @@ export function PrescriptionTable({
       {
         accessorKey: 'status',
         header: t('table.status'),
-        cell: ({ row }) => (
-          <StatusSelect
-            status={row.original.status}
-            onStatusChange={(newStatus) => onStatusChange?.(row.original.id, newStatus)}
-            disabled={isUpdating || !onStatusChange}
-          />
-        ),
+        cell: ({ row }) => <StatusBadge status={row.original.status} />,
       },
       {
         accessorKey: 'comment',
@@ -134,8 +131,35 @@ export function PrescriptionTable({
           </span>
         ),
       },
+      {
+        id: 'actions',
+        header: t('table.actions'),
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit?.(row.original)}
+              disabled={!onEdit}
+              title={t('actions.edit')}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete?.(row.original)}
+              disabled={!onDelete || isDeleting || row.original.status === 'suppr'}
+              title={t('actions.delete')}
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
     ],
-    [t, onStatusChange, isUpdating]
+    [t, onEdit, onDelete, isDeleting]
   );
 
   return (

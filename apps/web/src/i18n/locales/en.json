@@ -86,7 +86,9 @@
   },
   "form": {
     "title": "New prescription",
+    "editTitle": "Edit prescription",
     "description": "Fill in the prescription information",
+    "editDescription": "Update the prescription information",
     "patient": "Patient",
     "selectPatient": "Select a patient",
     "medication": "Medication",
@@ -97,7 +99,12 @@
     "endDate": "End date",
     "status": "Status",
     "submit": "Create prescription",
+    "update": "Update",
     "error": "Error creating prescription"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "pagination": {
     "previous": "Previous",
