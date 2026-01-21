@@ -1,0 +1,108 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "apply": "Apply",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All"
+  },
+  "header": {
+    "title": "Prescriptions",
+    "subtitle": "Medical prescriptions management"
+  },
+  "prescription": {
+    "title": "Prescriptions list",
+    "count": "{{count}} prescription(s)",
+    "empty": "No prescriptions found",
+    "new": "New prescription",
+    "details": "Prescription details",
+    "patient": "Patient",
+    "medication": "Medication",
+    "dosage": "Dosage",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "status": "Status",
+    "prescribedBy": "Prescribed by",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "noResults": "No prescriptions found",
+    "tryAdjustFilters": "Try adjusting your search criteria"
+  },
+  "table": {
+    "patient": "Patient",
+    "medication": "Medication",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "dates": "Dates",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "status": "Status",
+    "comment": "Comment",
+    "actions": "Actions",
+    "bornOn": "Born on {{date}}",
+    "deletePrescription": "Delete prescription {{id}}",
+    "confirmDelete": "Are you sure you want to delete this prescription?",
+    "loading": "Loading prescriptions...",
+    "displayedCount": "{{count}} prescription(s) displayed"
+  },
+  "status": {
+    "all": "All statuses",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "valide": "Valid",
+    "en_attente": "Pending",
+    "suppr": "Deleted"
+  },
+  "filters": {
+    "title": "Filters",
+    "patient": "Patient",
+    "allPatients": "All patients",
+    "medication": "Medication",
+    "allMedications": "All medications",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "clear": "Clear filters",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "apply": "Apply filters",
+    "reset": "Reset"
+  },
+  "form": {
+    "title": "New prescription",
+    "description": "Fill in the prescription information",
+    "patient": "Patient",
+    "selectPatient": "Select a patient",
+    "medication": "Medication",
+    "selectMedication": "Select a medication",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "status": "Status",
+    "submit": "Create prescription",
+    "error": "Error creating prescription"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}"
+  },
+  "errors": {
+    "loadFailed": "Failed to load data",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete",
+    "networkError": "Server connection error"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer",
+    "yes": "Oui",
+    "no": "Non",
+    "all": "Tous"
+  },
+  "header": {
+    "title": "Prescriptions",
+    "subtitle": "Gestion des prescriptions médicales"
+  },
+  "prescription": {
+    "title": "Liste des prescriptions",
+    "count": "{{count}} prescription(s)",
+    "empty": "Aucune prescription trouvée",
+    "new": "Nouvelle prescription",
+    "details": "Détails de la prescription",
+    "patient": "Patient",
+    "medication": "Médicament",
+    "dosage": "Posologie",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "status": "Statut",
+    "prescribedBy": "Prescrit par",
+    "createdAt": "Créé le",
+    "updatedAt": "Modifié le",
+    "noResults": "Aucune prescription trouvée",
+    "tryAdjustFilters": "Essayez de modifier vos critères de recherche"
+  },
+  "table": {
+    "patient": "Patient",
+    "medication": "Médicament",
+    "dosage": "Posologie",
+    "frequency": "Fréquence",
+    "dates": "Dates",
+    "startDate": "Date début",
+    "endDate": "Date fin",
+    "status": "Statut",
+    "comment": "Commentaire",
+    "actions": "Actions",
+    "bornOn": "Né(e) le {{date}}",
+    "deletePrescription": "Supprimer la prescription {{id}}",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette prescription ?",
+    "loading": "Chargement des prescriptions...",
+    "displayedCount": "{{count}} prescription(s) affichée(s)"
+  },
+  "status": {
+    "all": "Tous les statuts",
+    "active": "Actif",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "valide": "Valide",
+    "en_attente": "En attente",
+    "suppr": "Supprimée"
+  },
+  "filters": {
+    "title": "Filtres",
+    "patient": "Patient",
+    "allPatients": "Tous les patients",
+    "medication": "Médicament",
+    "allMedications": "Tous les médicaments",
+    "status": "Statut",
+    "allStatuses": "Tous les statuts",
+    "search": "Recherche",
+    "searchPlaceholder": "Rechercher...",
+    "clear": "Effacer les filtres",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "apply": "Appliquer les filtres",
+    "reset": "Réinitialiser"
+  },
+  "form": {
+    "title": "Nouvelle prescription",
+    "description": "Remplissez les informations de la prescription",
+    "patient": "Patient",
+    "selectPatient": "Sélectionner un patient",
+    "medication": "Médicament",
+    "selectMedication": "Sélectionner un médicament",
+    "dosage": "Posologie",
+    "frequency": "Fréquence",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "status": "Statut",
+    "submit": "Créer la prescription",
+    "error": "Erreur lors de la création de la prescription"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{current}} sur {{total}}"
+  },
+  "errors": {
+    "loadFailed": "Erreur lors du chargement des données",
+    "saveFailed": "Erreur lors de l'enregistrement",
+    "deleteFailed": "Erreur lors de la suppression",
+    "networkError": "Erreur de connexion au serveur"
+  }
+}
