@@ -59,19 +59,18 @@ export default defineConfig({
   ],
 
   /* Run both frontend and backend before starting the tests */
-  // Uncomment these for CI - servers should be started manually in development
-  // webServer: [
-  //   {
-  //     command: 'cd apps/api && uv run python manage.py runserver 8000',
-  //     url: 'http://127.0.0.1:8000/Patient',
-  //     reuseExistingServer: !process.env.CI,
-  //     timeout: 120 * 1000,
-  //   },
-  //   {
-  //     command: 'cd apps/web && npm run dev',
-  //     url: 'http://127.0.0.1:5173',
-  //     reuseExistingServer: !process.env.CI,
-  //     timeout: 120 * 1000,
-  //   },
-  // ],
+  webServer: [
+    {
+      command: 'cd apps/api && uv run python manage.py runserver 8000',
+      url: 'http://127.0.0.1:8000/Patient',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+    {
+      command: 'cd apps/web && npm run dev',
+      url: 'http://127.0.0.1:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+  ],
 });

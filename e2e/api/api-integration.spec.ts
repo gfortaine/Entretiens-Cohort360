@@ -7,6 +7,19 @@ import { test, expect } from '@playwright/test';
 
 const API_BASE = 'http://127.0.0.1:8000';
 
+/**
+ * Helper to extract results from paginated or non-paginated API response
+ */
+function getResults(data: unknown): unknown[] {
+  if (typeof data === 'object' && data !== null && 'results' in data) {
+    return (data as { results: unknown[] }).results;
+  }
+  if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
+}
+
 test.describe('API - Patients Endpoint', () => {
   test('GET /Patient - should return list of patients', async ({ request }) => {
     const response = await request.get(`${API_BASE}/Patient`);
@@ -15,12 +28,13 @@ test.describe('API - Patients Endpoint', () => {
     expect(response.status()).toBe(200);
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
-    if (data.length > 0) {
-      expect(data[0]).toHaveProperty('id');
-      expect(data[0]).toHaveProperty('last_name');
-      expect(data[0]).toHaveProperty('first_name');
+    if (results.length > 0) {
+      expect(results[0]).toHaveProperty('id');
+      expect(results[0]).toHaveProperty('last_name');
+      expect(results[0]).toHaveProperty('first_name');
     }
   });
 
@@ -30,11 +44,13 @@ test.describe('API - Patients Endpoint', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
     // All results should match the filter
-    data.forEach((patient: { last_name: string }) => {
-      expect(patient.last_name.toLowerCase()).toContain('martin');
+    results.forEach((patient) => {
+      const p = patient as { last_name: string };
+      expect(p.last_name.toLowerCase()).toContain('martin');
     });
   });
 });
@@ -47,12 +63,13 @@ test.describe('API - Medications Endpoint', () => {
     expect(response.status()).toBe(200);
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
-    if (data.length > 0) {
-      expect(data[0]).toHaveProperty('id');
-      expect(data[0]).toHaveProperty('code');
-      expect(data[0]).toHaveProperty('label');
+    if (results.length > 0) {
+      expect(results[0]).toHaveProperty('id');
+      expect(results[0]).toHaveProperty('code');
+      expect(results[0]).toHaveProperty('label');
     }
   });
 
@@ -62,10 +79,12 @@ test.describe('API - Medications Endpoint', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
-    data.forEach((medication: { status: string }) => {
-      expect(medication.status).toBe('actif');
+    results.forEach((medication) => {
+      const m = medication as { status: string };
+      expect(m.status).toBe('actif');
     });
   });
 });
@@ -80,18 +99,21 @@ test.describe('API - Prescriptions CRUD', () => {
     expect(response.status()).toBe(200);
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
   });
 
   test('POST /Prescription - should create a new prescription', async ({ request }) => {
     // First, get a patient and medication ID
     const patientsResponse = await request.get(`${API_BASE}/Patient`);
-    const patients = await patientsResponse.json();
-    const patientId = patients[0]?.id;
+    const patientsData = await patientsResponse.json();
+    const patients = getResults(patientsData);
+    const patientId = (patients[0] as { id: number })?.id;
 
     const medsResponse = await request.get(`${API_BASE}/Medication`);
-    const medications = await medsResponse.json();
-    const medicationId = medications[0]?.id;
+    const medsData = await medsResponse.json();
+    const medications = getResults(medsData);
+    const medicationId = (medications[0] as { id: number })?.id;
 
     if (!patientId || !medicationId) {
       test.skip();
@@ -126,14 +148,15 @@ test.describe('API - Prescriptions CRUD', () => {
   test('GET /Prescription/:id - should get prescription details', async ({ request }) => {
     // Get all prescriptions and pick the first one
     const listResponse = await request.get(`${API_BASE}/Prescription`);
-    const prescriptions = await listResponse.json();
+    const listData = await listResponse.json();
+    const prescriptions = getResults(listData);
 
     if (prescriptions.length === 0) {
       test.skip();
       return;
     }
 
-    const prescriptionId = prescriptions[0].id;
+    const prescriptionId = (prescriptions[0] as { id: number }).id;
     const response = await request.get(`${API_BASE}/Prescription/${prescriptionId}`);
 
     expect(response.ok()).toBeTruthy();
@@ -149,14 +172,15 @@ test.describe('API - Prescriptions CRUD', () => {
 
   test('PATCH /Prescription/:id - should update prescription', async ({ request }) => {
     const listResponse = await request.get(`${API_BASE}/Prescription`);
-    const prescriptions = await listResponse.json();
+    const listData = await listResponse.json();
+    const prescriptions = getResults(listData);
 
     if (prescriptions.length === 0) {
       test.skip();
       return;
     }
 
-    const prescriptionId = prescriptions[0].id;
+    const prescriptionId = (prescriptions[0] as { id: number }).id;
     const updateData = {
       comment: 'Updated by E2E test - ' + new Date().toISOString(),
     };
@@ -177,10 +201,12 @@ test.describe('API - Prescriptions CRUD', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
-    data.forEach((prescription: { status: string }) => {
-      expect(prescription.status).toBe('valide');
+    results.forEach((prescription) => {
+      const p = prescription as { status: string };
+      expect(p.status).toBe('valide');
     });
   });
 
@@ -192,11 +218,13 @@ test.describe('API - Prescriptions CRUD', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBe(true);
+    const results = getResults(data);
+    expect(Array.isArray(results)).toBe(true);
 
     // Verify dates are valid - the API uses start_date/end_date in response
-    data.forEach((prescription: { start_date?: string; date_debut?: string }) => {
-      const dateStr = prescription.start_date || prescription.date_debut;
+    results.forEach((prescription) => {
+      const p = prescription as { start_date?: string; date_debut?: string };
+      const dateStr = p.start_date || p.date_debut;
       if (dateStr) {
         const date = new Date(dateStr);
         expect(date.getFullYear()).toBeGreaterThanOrEqual(2024);
@@ -207,12 +235,14 @@ test.describe('API - Prescriptions CRUD', () => {
 
   test('POST /Prescription - validation should reject invalid dates', async ({ request }) => {
     const patientsResponse = await request.get(`${API_BASE}/Patient`);
-    const patients = await patientsResponse.json();
-    const patientId = patients[0]?.id;
+    const patientsData = await patientsResponse.json();
+    const patients = getResults(patientsData);
+    const patientId = (patients[0] as { id: number })?.id;
 
     const medsResponse = await request.get(`${API_BASE}/Medication`);
-    const medications = await medsResponse.json();
-    const medicationId = medications[0]?.id;
+    const medsData = await medsResponse.json();
+    const medications = getResults(medsData);
+    const medicationId = (medications[0] as { id: number })?.id;
 
     if (!patientId || !medicationId) {
       test.skip();
