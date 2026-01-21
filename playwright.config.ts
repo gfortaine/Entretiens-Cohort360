@@ -58,14 +58,22 @@ export default defineConfig({
     },
   ],
 
-  /* Run both frontend and backend before starting the tests */
+  /**
+   * Web servers started before tests
+   * 
+   * For boilerplate:
+   * - Frontend only: Set PLAYWRIGHT_API_OPTIONAL=1 to skip backend
+   * - Full-stack: Both servers required (default)
+   */
   webServer: [
-    {
+    // Backend API (optional for frontend-only testing)
+    ...(process.env.PLAYWRIGHT_API_OPTIONAL ? [] : [{
       command: 'cd apps/api && uv run python manage.py runserver 8000',
-      url: 'http://127.0.0.1:8000/Patient',
+      url: 'http://127.0.0.1:8000/admin/',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
-    },
+    }]),
+    // Frontend
     {
       command: 'cd apps/web && npm run dev',
       url: 'http://127.0.0.1:5173',
