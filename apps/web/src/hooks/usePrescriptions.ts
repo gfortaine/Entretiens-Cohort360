@@ -58,6 +58,10 @@ export function useUpdatePrescription() {
   });
 }
 
+/**
+ * Soft delete: marks prescription as 'suppr' status.
+ * Per React spec: "Soft delete (change status to 'suppr')"
+ */
 export function useDeletePrescription() {
   const queryClient = useQueryClient();
   

@@ -69,10 +69,14 @@ export const prescriptionsApi = {
   },
 
   /**
-   * Supprime une prescription.
+   * Soft delete: change status to 'suppr' per spec.
+   * The React spec explicitly requires: "Soft delete (change status to 'suppr')"
    */
-  async delete(id: number): Promise<void> {
-    await apiClient.delete(`/Prescription/${id}`);
+  async delete(id: number): Promise<Prescription> {
+    const { data } = await apiClient.patch<Prescription>(`/Prescription/${id}`, {
+      status: 'suppr',
+    });
+    return data;
   },
 };
 
