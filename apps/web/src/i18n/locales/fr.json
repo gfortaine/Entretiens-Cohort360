@@ -118,5 +118,20 @@
     "saveFailed": "Erreur lors de l'enregistrement",
     "deleteFailed": "Erreur lors de la suppression",
     "networkError": "Erreur de connexion au serveur"
+  },
+  "toast": {
+    "prescriptionCreated": "Prescription créée avec succès",
+    "prescriptionUpdated": "Prescription mise à jour avec succès",
+    "prescriptionDeleted": "Prescription supprimée avec succès",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "deleting": "Suppression..."
+  },
+  "errorBoundary": {
+    "title": "Une erreur est survenue",
+    "message": "Nous sommes désolés, quelque chose s'est mal passé. Notre équipe a été notifiée.",
+    "details": "Détails techniques",
+    "retry": "Réessayer",
+    "home": "Retour à l'accueil"
   }
 }

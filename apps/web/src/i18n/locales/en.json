@@ -118,5 +118,20 @@
     "saveFailed": "Failed to save",
     "deleteFailed": "Failed to delete",
     "networkError": "Server connection error"
+  },
+  "toast": {
+    "prescriptionCreated": "Prescription created successfully",
+    "prescriptionUpdated": "Prescription updated successfully",
+    "prescriptionDeleted": "Prescription deleted successfully",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "deleting": "Deleting..."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "We're sorry, something went wrong. Our team has been notified.",
+    "details": "Technical details",
+    "retry": "Try again",
+    "home": "Go to home"
   }
 }

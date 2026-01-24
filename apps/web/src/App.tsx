@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Filter, Plus, X, RefreshCw } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,21 +11,12 @@ import { PrescriptionFiltersForm } from '@/components/PrescriptionFiltersForm';
 import { PrescriptionFormDialog } from '@/components/PrescriptionFormDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
-import { usePrescriptions, useUpdatePrescription } from '@/hooks/usePrescriptions';
+import { usePrescriptions, useDeletePrescription } from '@/hooks/usePrescriptions';
 import { usePrescriptionFiltersUrl } from '@/hooks/usePrescriptionFiltersUrl';
 import { DEFAULT_PAGE_SIZE, type Prescription } from '@/types';
 import logoAphp from '@/assets/logo-aphp-white.png';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-function PrescriptionApp() {
+function App() {
   const { t } = useTranslation();
   const { filters, setFilters, page, setPage } = usePrescriptionFiltersUrl();
   const [showForm, setShowForm] = useState(false);
@@ -34,11 +24,10 @@ function PrescriptionApp() {
   const [showFilters, setShowFilters] = useState(true);
   
   const { data, isLoading, error, refetch } = usePrescriptions(filters, { page });
-  const deleteMutation = useUpdatePrescription();
+  const deleteMutation = useDeletePrescription();
   
   const prescriptions = data?.results ?? [];
   const totalCount = data?.count ?? 0;
-  const totalPages = Math.ceil(totalCount / DEFAULT_PAGE_SIZE);
 
   const handleEdit = (prescription: Prescription) => {
     setEditingPrescription(prescription);
@@ -46,12 +35,8 @@ function PrescriptionApp() {
   };
 
   const handleDelete = async (prescription: Prescription) => {
-    // Soft delete: PATCH with status = 'suppr'
-    try {
-      await deleteMutation.mutateAsync({ id: prescription.id, data: { status: 'suppr' } });
-    } catch (error) {
-      console.error('Delete failed:', error);
-    }
+    // Soft delete via mutation - toast handled in hook
+    await deleteMutation.mutateAsync(prescription.id);
   };
 
   const handleFormClose = (open: boolean) => {
@@ -221,20 +206,11 @@ function PrescriptionApp() {
         onOpenChange={handleFormClose}
         prescription={editingPrescription}
         onSuccess={() => {
-          refetch();
           setShowForm(false);
           setEditingPrescription(undefined);
         }}
       />
     </div>
-  );
-}
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <PrescriptionApp />
-    </QueryClientProvider>
   );
 }
 
